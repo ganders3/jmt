@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Job Match Tool</title>
+
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="vendor/dropzone/dropzone.min.css"> -->
+    <link rel="stylesheet" href="style.css">
+
+  </head>
+
+  <body>
+
+    <!-- This div contains all of the html, so that it is linked to vue -->
+    <div id="app">
+
+      <!-- {{gregCheck}} -->
+      <section class="section-1" id="intro" v-if="!programIsRunning">
+        <div class="container col-sm-5">
+          <h1>AFRS Job Match Tool</h1>
+          <p>
+            Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the <strong>Q&amp;W file from AFRISS</strong>, and the <strong>Open Jobs file from TTMS.</strong> It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
+          </p>
+        </div>
+      </section>
+
+
+
+      <!-- <section class="section-2" id="filedrop" v-if="!programIsRunning"> -->
+      <section class="section-2" id="filedrop">
+
+        <form method="post" enctype="multipart/form-data">
+          <label for="image_uploads">Add the Q&amp;W file and the Open Jobs file to begin.</label>
+          <div>
+            <input type="file" id="image_uploads" name="image_uploads" accept=".csv, .xlsx, .xls" multiple>
+          </div>
+          <div class="preview">
+            <p>No files selected</p>
+          </div>
+        </form>
+        
+        <!-- <button @click="startProgram" class="btn btn-primary start">Start</button>  -->
+        <button onclick="startProgram()" class="btn btn-primary start">Start</button>
+
+      </section>
+
+
+
+
+      <section id="results" class="section-1" v-if="programIsRunning">
+        <h2>Results</h2>
+
+        <div class="card-deck text-center" id="card-deck-scores">
+        <!-- The cards here will be filled in using jQuery within the job-match.js file -->
+
+        </div>
+      </section>
+
+
+      <section id="results-buttons" class="section-2" v-if="programIsRunning">
+        <div class="container text-center">
+          <a class="btn btn-primary" id="csv-link">Download results</a>
+          <button onclick="endProgram()" class="btn btn-secondary">Start over</button>
+        </div>
+      </section>
+
+
+      <section class="section-1">
+        <div class="container col-sm-3">
+          
+          <div class="list-group text-center">
+            <ul id="match-list">
+            <!-- The list here will be filled in using jQuery within the job-match.js file -->
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div> <!-- This is the main app div -->
+
+
+
+    <footer class="footer">
+      <div class="container">
+        <span>
+          This website and the job matching algorithm were programmed by Greg Anderson. For questions or feedback please email <a href="mailto:email@host.com">email@host.com</a>.
+        </span>
+      </div>
+    </footer>
+
+
+
+
+    <!-- xxxxxxxxxxxxxxxxxxxx Scripts xxxxxxxxxxxxxxxxxxxxxxxxxx -->
+    <script src="vendor/js/jquery.min.js"></script>
+    <!-- <script src="vendor/js/lodash.min.js"></script> -->
+    <script src="vendor/js/d3.min.js"></script>
+    <!-- <script src="vendor/js/vue.js"></script> -->
+    <!-- <script src="vendor/bootstrap/js/bootstrap.min.js"></script> -->
+
+    <script src="app.js"></script>
+    <script src="job-match.js"></script>
+  </body>
+
+
+</html>

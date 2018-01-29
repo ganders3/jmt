@@ -1,0 +1,170 @@
+html, body {
+	height: 100%;
+}
+
+img {
+	max-width: 100%;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+section {
+	/*padding: 2rem 0;*/
+}
+
+.section-1, .section-2 {
+	padding: 2rem 4rem;
+}
+
+.section-1 {
+	background-color: #fff;
+}
+
+.section-2 {
+	background-color: #eee;
+}
+
+#app {
+	min-height: 100%;
+	height: auto !important;
+	margin: 0 auto -5rem;
+	padding-bottom: 8rem;
+}
+
+#intro {
+	text-align: justify;
+}
+
+#filedrop {
+	align-content: center;
+	text-align: center;
+}
+
+
+.file-input {
+	height: 5rem;
+	width: 50%;
+	margin-bottom: 2rem;
+	padding: 0rem;
+	border: 2px dashed #4da6fb;
+	background-color: #fff;
+}
+
+.dropzone{
+	margin: auto;
+	padding: 1rem;
+	width: 80%;
+	height: 12rem;
+	border: 2px dashed #4da6fb;
+	border-radius: 0.5rem;
+	background-color: #fff;
+}
+
+.btn-primary, .btn-secondary {
+	/*width: 5rem;*/
+	display: inline;
+	cursor: pointer;
+}
+
+.container {
+	/*color: red;*/
+	align-content: center;
+	/*padding: 100px;*/
+}
+
+.start {
+/*	background-image: linear-gradient(
+		to left,
+		transparent,
+    	transparent 50%,
+    	#1ead63 50%,
+    	#1ead63);
+	background-position: 100% 0;
+    background-size: 200% 100%;
+    transition: all 0.4s ease-in;*/
+}
+
+.start:hover {
+	background-color: #1ead63;
+	border: 1px solid #1ead63;
+/*	background-position: 0 0;
+	border: 1px solid #1ead63;*/
+}
+
+.card-title {
+	text-transform: capitalize;
+}
+
+.footer {
+	width: 100%;
+	height: 5rem;
+	padding: 1rem;
+	bottom: 0;
+	position: fixed;
+	background-color: #333;
+	color: #fff;
+}
+
+
+
+
+
+/*--------------------------------------------------------------*/
+
+/*html {
+  font-family: sans-serif;
+}
+
+form {
+  width: 600px;
+  background: #ccc;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid black;
+}
+
+form ol {
+  padding-left: 0;
+}
+
+form li, div > p {
+  background: #eee;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  list-style-type: none;
+  border: 1px solid black;
+}
+*/
+
+form img {
+  height: 2.5rem;
+  order: 1;
+}
+
+/*
+form p {
+  line-height: 32px;
+  padding-left: 10px;
+}
+
+form label, form button {
+  background-color: #7F9CCB;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px ridge black;
+  font-size: 0.8rem;
+  height: auto;
+}
+
+form label:hover, form button:hover {
+  background-color: #2D5BA3;
+  color: white;
+}
+
+form label:active, form button:active {
+  background-color: #0D3F8F;
+  color: white;
+}*/
