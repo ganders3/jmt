@@ -1,106 +1,85 @@
 var input = document.querySelector('input');
-var preview = document.querySelector('.preview');
+var preview = document.querySelector('.file-preview');
 
-// var input = $('input');
-// var preview = $('.preview');
+var qwString;
+var jobsString;
 // input.style.opacity = 0;
 
-input.addEventListener('change', handleFiles); //updateImageDisplay);
+input.addEventListener('change', handleFiles);
 //******************* figure out how to get IE to work when files are added ********************
 // input.attachEvent('onchange', handleFiles);
 
+// initializeDom();
+$(document).ready(() => {
+	initializeDom();
+});
+
+
+function initializeDom() {
+	$('#btn-run-jmt').attr('disabled', 'disabled');
+	$('#sec-intro').show('fast');
+	$('#sec-file-browse').show('fast');
+	$('#sec-results').hide();
+}
+
+
 function handleFiles() {
-	updateImageDisplay();
-	// console.log(input.files);
 	readFiles();
+	updateImageDisplay();
 }
 
 
 function readFiles() {
-	// console.log('files:', input.files);
 	var currentFiles = input.files;
 	for(i=0; i<currentFiles.length; i++) {
-		// console.log(currentFiles[i]);
-
 		if(validFileType(currentFiles[i])) {
 			let fileReader = new FileReader();
 			fileReader.onload = (fr) => {
-				// console.log('fr.target.result:', fr.target.result);
-				// console.log('fr.target.result.length:', fr.target.result.length);
-				// console.log('fr.target.result.search(newline):', fr.target.result.search('\n'));
-
 				validFileContents(fr.target.result);
+				checkForRequiredFiles();
 			}
 			fileReader.readAsText(currentFiles[i]);
-			// console.log('fileReader:',fileReader);
-
-
-		}
-		// console.log(file.name);
-	}
-}
-
-function validFileContents(contents) {
-	if(contents.slice(0,4) === 'AFSC') {
-		jobsString = contents;
-	} else if(contents.slice(0,4) === 'Prog') {
-		qwString = contents;
-	}
-}
-
-
-function updateImageDisplay() {
-	//removes all items within the preview element
-	while(preview.firstChild) {
-	preview.removeChild(preview.firstChild);
-	}
-
-	var curFiles = input.files;
-	if(curFiles.length === 0) {
-		var para = document.createElement('p');
-		para.textContent = 'No files selected';
-		preview.appendChild(para);
-	} else {
-		var list = document.createElement('ol');
-		preview.appendChild(list);
-		for(var i = 0; i < curFiles.length; i++) {
-		  var listItem = document.createElement('li');
-		  var para = document.createElement('p');
-		  if(validFileType(curFiles[i])) {
-		    para.textContent = curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
-		    var image = document.createElement('img');
-		    image.src = 'img/icon-notepad.png';
-
-		    listItem.appendChild(image);
-		    listItem.appendChild(para);
-
-		  } else {
-		    para.textContent = curFiles[i].name + ' is not a valid file type.';
-		    listItem.appendChild(para);
-		  }
-
-		  list.appendChild(listItem);
 		}
 	}
+	
 }
-
-
-var fileTypes = [
-  'application/vnd.ms-excel'
-  // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-]
-
-
 
 
 function validFileType(file) {
-	// console.log(file.type)
-	for(var i = 0; i < fileTypes.length; i++) {
-		if(file.type === fileTypes[i]) {
+	const FILE_TYPES = [
+		'.csv',
+		'text/csv',
+		'application/vnd.ms-excel',
+  // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+	];
+
+	for(var i = 0; i < FILE_TYPES.length; i++) {
+		// console.log(file.type)
+		if(file.type === FILE_TYPES[i]) {
 		  return true;
 		}
 	}
 	return false;
+}
+
+
+function validFileContents(contents) {
+	if(contents.slice(0,4) === 'AFSC') {
+		jobsString = contents;
+		$('#excel').removeClass('icon-disabled');
+	} else if(contents.slice(0,4) === 'Prog') {
+		qwString = contents;
+		$('#notepad').removeClass('icon-disabled');
+	}
+}
+
+function checkForRequiredFiles() {
+	if(qwString && jobsString) {
+		$('#btn-run-jmt').removeAttr('disabled');
+	}
+}
+
+function updateImageDisplay() {
 }
 
 
@@ -127,26 +106,45 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	var arr = [];
 	lines.forEach((line) => {
 		//Split each line by commas to get an array of each entry
-		var entries = line.split(delimiter);
+		var fields = line.split(delimiter);
+		fields = fixFragmentedStrings(fields)
+		console.log(fields);
 
 		arr.push({});
-		for(i=0; i<entries.length; i++) {
-			arr[arr.length-1][columnNames[i]] = entries[i];
+		for(i=0; i<fields.length; i++) {
+			arr[arr.length-1][columnNames[i]] = fields[i];
 		}
 	});
 	return arr;
 }
 
 
-
+function fixFragmentedStrings(arr) {
+	console.log('before:', arr);
+	var fragmentedString = '';
+	arr.forEach((field, ind) => {
+		if(field.search('\"') !== -1) {
+			if(fragmentedString === '') {
+				fragmentedString += field.replace('\"', '') + ', ';
+			} else {
+				fragmentedString += field.replace('\"', '');
+				arr[ind-1] = fragmentedString;
+				arr.splice(ind, 1);
+				fragmentedString = '';
+			}
+		}
+	});
+	console.log('after:', arr);
+	return arr;
+}
 
 
 function returnFileSize(number) {
-	if(number < 1024) {
-		return number + 'bytes';
-	} else if(number > 1024 && number < 1048576) {
-		return (number/1024).toFixed(1) + 'KB';
-	} else if(number > 1048576) {
-		return (number/1048576).toFixed(1) + 'MB';
-	}
+  if(number < 1024) {
+    return number + ' bytes';
+  } else if(number > 1024 && number < 1048576) {
+    return (number/1024).toFixed(1) + ' KB';
+  } else if(number > 1048576) {
+    return (number/1048576).toFixed(1) + ' MB';
+  }
 }

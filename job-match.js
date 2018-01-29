@@ -1,4 +1,6 @@
 //====================================================================================
+var matchingComplete = false;
+
 const NUM_ITER = 1;
 const NUM_AFSC_PREFS = 20;
 
@@ -54,24 +56,22 @@ var bestMatches = [];
 
 
 function startProgram() {
-
 	initializeVariables();
 	importData();
 
 	preprocessQw();
 	preprocessJobs();
 	matchJobs();
-	createCsv();
 	logConsole();
 
-	printResults();
+	// printResults();
+	updateDom();
+	createCsv();
 }
 
 function endProgram() {
-	// programIsRunning = false;
+	initializeDom();
 	initializeVariables();
-	// matches = [];
-	console.log('end program');
 }
 
 
@@ -99,7 +99,7 @@ function importData() {
 
 
 function preprocessQw() {
-	qw = qwRaw
+	qw = qwRaw;
 	qw.forEach((person, ind) => {
 		//Create a new empty array for the person's AFSC preferences
 		person.prefs = [];
@@ -248,7 +248,7 @@ function matchJobs() {
 			});
 		});
 
-		//sort matches array by jobId
+		//sort matches array by jobInd
 		matches.sort((a,b) => {
 			return(a.jobInd - b.jobInd);
 		});
@@ -350,7 +350,7 @@ function matchJobs() {
 	}
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+	matchingComplete = true;
 } // End match jobs
 
 
@@ -386,7 +386,7 @@ function createCsv() {
 
 // Convert dates to JS format (this is a D3 function)
 function convertDate(dateInput, dateFormat) {
-	var dateParser = d3.time.format(dateFormat).parse;
+	var dateParser = d3.timeParse(dateFormat);
 	return dateParser(dateInput);
 }
 
@@ -400,7 +400,11 @@ function logConsole() {
 
 
 
-function printResults() {
+function updateDom() {
+
+	$('#sec-intro').hide('fast');
+	$('#sec-file-browse').hide('fast');
+	$('#sec-results').show('fast');
 
 	// Empty the html elements containing the list of matches and the results
 	$('#card-deck-scores').empty();
@@ -436,6 +440,4 @@ function printResults() {
 		$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
 		$('#match-list li').last().addClass(cl);
 	});
-
-
 }
