@@ -1,1 +1,2 @@
-# jmt
+# Job Match Tool
+Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the Q&W file from AFRISS, and the Open Jobs file from TTMS. It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII. 
