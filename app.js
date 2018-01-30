@@ -16,10 +16,16 @@ $(document).ready(() => {
 
 
 function initializeDom() {
-	$('#btn-run-jmt').attr('disabled', 'disabled');
+	$('#btn-run-jmt').attr({
+		disabled: 'disabled',
+		style: 'cursor: not-allowed'
+	});
+	// $('#btn-run-jmt').attr('style', 'cursor: not-allowed');
 	$('#sec-intro').show('fast');
 	$('#sec-file-browse').show('fast');
 	$('#sec-results').hide();
+
+	checkForRequiredFiles();
 }
 
 
@@ -29,15 +35,18 @@ function handleFiles() {
 }
 
 
-function readFiles() {
+function readFiles() {	
 	var currentFiles = input.files;
-	for(i=0; i<currentFiles.length; i++) {
-		if(validFileType(currentFiles[i])) {
+
+	for (i=0; i<currentFiles.length; i++) {
+		if (validFileType(currentFiles[i])) {
 			let fileReader = new FileReader();
+
 			fileReader.onload = (fr) => {
 				validFileContents(fr.target.result);
 				checkForRequiredFiles();
 			}
+
 			fileReader.readAsText(currentFiles[i]);
 		}
 	}
@@ -66,16 +75,19 @@ function validFileType(file) {
 function validFileContents(contents) {
 	if(contents.slice(0,4) === 'AFSC') {
 		jobsString = contents;
-		$('#excel').removeClass('icon-disabled');
+		// $('#excel').removeClass('icon-disabled');
+		$('#icon-jobs').removeClass('icon-disabled');
 	} else if(contents.slice(0,4) === 'Prog') {
 		qwString = contents;
-		$('#notepad').removeClass('icon-disabled');
+		// $('#notepad').removeClass('icon-disabled');
+		$('#icon-qw').removeClass('icon-disabled');
 	}
 }
 
 function checkForRequiredFiles() {
 	if(qwString && jobsString) {
 		$('#btn-run-jmt').removeAttr('disabled');
+		$('#btn-run-jmt').attr('style','cursor: pointer');
 	}
 }
 
@@ -108,7 +120,6 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 		//Split each line by commas to get an array of each entry
 		var fields = line.split(delimiter);
 		fields = fixFragmentedStrings(fields)
-		console.log(fields);
 
 		arr.push({});
 		for(i=0; i<fields.length; i++) {
@@ -116,11 +127,10 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 		}
 	});
 	return arr;
+
 }
 
-
 function fixFragmentedStrings(arr) {
-	console.log('before:', arr);
 	var fragmentedString = '';
 	arr.forEach((field, ind) => {
 		if(field.search('\"') !== -1) {
@@ -134,7 +144,6 @@ function fixFragmentedStrings(arr) {
 			}
 		}
 	});
-	console.log('after:', arr);
 	return arr;
 }
 

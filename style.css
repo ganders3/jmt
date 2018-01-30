@@ -15,22 +15,26 @@ h1, h2 {
 
 
 form {
-	display: inline-block;
 	width: 50%;
+	padding: 0;
+	display: inline-block;
 	background-color: #fff;
 	border: 2px dashed #4da5fb;
-	padding: 0;
+}
+
+
+label, input {
+	width: 100%;
+	cursor: pointer;
 }
 
 label {
 	height: 10rem;
-	width: 100%;
 	padding: 5rem;
 	margin: 0;
 }
 
 input {
-	width: 100%;
 	opacity: 0;
 }
 
@@ -43,7 +47,9 @@ div {
 	/*margin-top: 1rem;*/
 }
 
-
+ul {
+	list-style: none;
+}
 
 .section-1, .section-2 {
 	padding: 2rem 0rem;
@@ -67,10 +73,16 @@ div {
 	align-content: center;
 }
 
-.file-preview {
-	margin: 1rem;
-	/*display: inline-block;*/
+.file-preview ul {
+	overflow: hidden;
 }
+
+.file-preview ul li {
+	display: inline-block;
+	margin: 0 2rem;
+	/*float: left;*/
+}
+
 
 
 .file-preview img {
@@ -88,6 +100,14 @@ div {
 	cursor: pointer;
 }
 
+.card-deck {
+	margin: 1rem 2rem 0 2rem;
+}
+
+.card {
+	padding: 1rem;
+}
+
 .icon-disabled {
 	opacity: 0.3;
 }
@@ -103,12 +123,51 @@ div {
 }
 
 
+.page-footer {
+/*	background-color: #333;
+	color: #fff;*/
+}
 .footer {
 	width: 100%;
-	height: 5rem;
-	padding: 1rem;
+	height: auto;
+	padding-top: 1rem;
 	bottom: 0;
 	position: fixed;
 	background-color: #333;
 	color: #fff;
+}
+
+.icon-main {
+	color: #007bff;
+}
+
+.icon-sm {
+	font-size: 1.5rem;
+}
+
+.icon-md {
+	font-size: 3rem;
+}
+
+.icon-lg {
+	font-size: 4rem;
+}
+
+.icon-footer {
+	margin-right: 1rem;
+}
+
+.ul-footer a{
+	color: #fff;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+}
+
+.ul-footer a:hover {
+	color: #007bff;
+}
+
+.icon-text {
+	/*vertical-align: middle;*/
 }

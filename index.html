@@ -9,7 +9,8 @@
 
     <title>Job Match Tool</title>
 
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="vendor/ionicons/css/ionicons.css">
     <link rel="stylesheet" href="style.css">
   </head>
 
@@ -36,27 +37,47 @@
       <div>
         <form method="post" enctype="multipart/form-data">
           <label for="file-uploads">Add the Q&amp;W file and the Jobs file to begin job matching.</label>
-          <!-- <div> -->
             <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
-          <!-- </div> -->
+
+<!--           <div class="file-preview">
+            <div class="d-inline">
+              <img id="notepad" class="icon-disabled" src="img/icon-notepad.png" alt="Excel">
+              <p id="qw-file-path">Q&amp;W</p>
+            </div>
+
+            <div class="d-inline">
+              <img id="excel" class="icon-disabled" src="img/icon-excel.png" alt="Notepad">              
+              <p id="jobs-file-path">Jobs</p>
+            </div>
+          </div> -->
         </form>
       </div>
 
 
-        <div class="file-preview">
-          <div class="d-inline">
-            <img id="notepad" class="icon-disabled" src="img/icon-notepad.png" alt="Excel">
-            <p>Q&amp;W</p>
-          </div>
+      <div class="file-preview">
+        <ul class="ul-files">
+          <li><i id="icon-qw" class="ion-person-stalker icon-main icon-md icon-disabled"></i> Q&amp;W</li>
+          <li><i id="icon-jobs" class="ion-document-text icon-main icon-md icon-disabled"></i> Jobs</li>
+        </ul>  
 
-          <div class="d-inline">
-            <img id="excel" class="icon-disabled" src="img/icon-excel.png" alt="Notepad">              
-            <p>Jobs</p>
-          </div>
-        </div>
+      </div>
+
+
+        <!-- <div class="file-preview"> -->
+          <!-- <div class="d-inline"> -->
+            <!-- <img id="notepad" class="icon-disabled" src="img/icon-notepad.png" alt="Excel"> -->
+            <!-- <p id="qw-file-path"><i id="icon-qw" class="ion-person-stalker icon-md icon-disabled"></i> Q&amp;W</p> -->
+            <!-- <p id="jobs-file-path"><i id="icon-jobs" class="ion-document-text icon-md icon-disabled"></i> Jobs</p> -->
+          <!-- </div> -->
+
+          <!-- <div class="d-inline"> -->
+            <!-- <img id="excel" class="icon-disabled" src="img/icon-excel.png" alt="Notepad">               -->
+            <!-- <p id="jobs-file-path"><i id="icon-jobs" class="ion-document-text icon-md icon-disabled"></i> Jobs</p> -->
+          <!-- </div> -->
+        <!-- </div> -->
       
       <div>
-        <button type="button" onclick="startProgram()" id="btn-run-jmt" class="btn btn-primary">Run Job Match</button>
+        <button type="button" onclick="startProgram()" id="btn-run-jmt" class="btn btn-success">Run Job Match</button>
       </div>
     </section>
 
@@ -76,8 +97,8 @@
 
       <section id="results-buttons" class="section-2">
         <div class="container text-center">
-          <a class="btn btn-primary" id="csv-link">Download results</a>
-          <button onclick="endProgram()" class="btn btn-secondary">Start over</button>
+          <a class="btn btn-primary" id="csv-link">Download Results</a>
+          <button onclick="endProgram()" class="btn btn-secondary">Start Over</button>
         </div>
       </section>
 
@@ -93,14 +114,24 @@
     </section>
     
 
-
-
-
     <footer class="footer">
       <div class="container">
-        <span>
-          This website and the job matching algorithm were programmed by Greg Anderson. For questions or feedback please email <a href="mailto:email@host.com">email@host.com</a>.
-        </span>
+        <div class="row">
+
+          <div class="col">
+            <span>
+              This website and the job matching algorithm were programmed by Greg Anderson. All code is free and open source.
+            </span>          
+          </div>
+
+          <div class="col">
+            <ul class="ul-footer">
+              <li><a href="https://github.com/ganders3/jmt" target="blank"><i class="ion-social-github icon-sm icon-footer"></i><span class="icon-text">Job Match Tool on Github</span></a></li>
+              <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
+            </ul>
+          </div>
+
+        </div>
       </div>
     </footer>
 

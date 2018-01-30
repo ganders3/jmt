@@ -280,8 +280,11 @@ function matchJobs() {
 			job.filledBy = undefined;
 		});
 
-		//Randomly sort the jobs order
-		// sortJobs();
+		//Sort jobs based on which are hardest to fill
+		jobs.sort((a,b) => {
+			return a.possibleFills - b.possibleFills;
+		});
+		// sortJobs(false);
 
 		//Reset each person to be unselected
 		qw.forEach((person) => {
@@ -293,15 +296,15 @@ function matchJobs() {
 	}
 
 
-	function sortJobs(random) {
-		if (random) {
-			jobs = shuffleArray(jobs);
-		} else {
-			jobs.sort((a,b) => {
-				return a.possibleFills - b.possibleFills;
-			});
-		}
-	}
+	// function sortJobs() {
+	// 	if (random) {
+	// 		jobs = shuffleArray(jobs);
+	// 	} else {
+	// 		jobs.sort((a,b) => {
+	// 			return a.possibleFills - b.possibleFills;
+	// 		});
+	// 	}
+	// }
 
 
 	function filterAndSortQw(qw, matchingEad, matchingAfsc) {
@@ -427,7 +430,8 @@ function updateDom() {
 		var msg;
 		var cl = 'list-group-item-';
 		if(match.jobInd !== undefined && match.qwInd !== undefined) {
-			msg = 'Job ' + match.jobInd + ' matched to person ' + match.qwInd;
+			// msg = 'Job ' + match.jobInd + ' matched to person ' + match.qwInd;
+			msg = 'Job ' + jobs[match.jobInd].afsc + ' matched to person ' + match.qwInd;
 			cl += 'success';
 		} else if(match.jobInd !== undefined) {
 			msg = 'Job ' + match.jobInd + ' was not filled';
