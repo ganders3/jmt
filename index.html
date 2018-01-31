@@ -21,6 +21,14 @@
     <section id="sec-intro" class="section-1">
       <div class="container col-sm-5">
         <h1>AFRS Job Match Tool</h1>
+
+        <ul>
+          <li>&bull; Trim the initializing of scores array. Do it within the initialize function instead?</li>
+          <li>&bull; Bar chart showing percentages matched - D3 clickable?</li>
+          <li>&bull; Fix parse files function to account for newline \r\n vs \n</li>
+          <li>&bull; Redesign file upload section - plus button, indicators for QW and Jobs</li>
+        </ul>
+
         <p>
           Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the <b>Q&amp;W file</b> from <b><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank">AFRISS</a></b>, and the <b>Open Jobs file</b> from <b><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank">TTMS</a></b>. It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
         </p>
