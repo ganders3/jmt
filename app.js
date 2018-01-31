@@ -12,6 +12,14 @@ input.addEventListener('change', handleFiles);
 // initializeDom();
 $(document).ready(() => {
 	initializeDom();
+
+	$('form').hover(function() {
+		// $('.icon-add-files').attr('style', 'color: #218838')
+		$('.icon-add-files').attr('style', 'opacity: 1')
+	}, function() {
+		// $('.icon-add-files').attr('style', 'color: #28a745');
+		$('.icon-add-files').attr('style', 'opacity: 0.65');
+	});
 });
 
 
@@ -88,6 +96,12 @@ function checkForRequiredFiles() {
 	if(qwString && jobsString) {
 		$('#btn-run-jmt').removeAttr('disabled');
 		$('#btn-run-jmt').attr('style','cursor: pointer');
+
+		$('.ion-plus-circled').addClass('ion-checkmark-round');
+		$('.ion-checkmark-round').removeClass('ion-plus-circled');
+
+		// $('.ion-plus-round').addClass('ion-checkmark-round');
+		// $('.ion-checkmark-round').removeClass('ion-plus-round');
 	}
 }
 

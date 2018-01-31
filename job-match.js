@@ -13,6 +13,7 @@ const KEEP_COLUMNS = {
 	QW: ['id', 'prefs', 'eadFrom', 'eadTo', 'daysInDep', 'selected', 'originalIndex', 'filledJob']
 }
 
+// var scores = {equal: {}, normalized: {}, linear: {}}
 var scores = {
 	equal: {
 		best: {
@@ -116,8 +117,8 @@ function preprocessQw() {
 			}
 		} //End for i=1 to NUM_AFSC_PREFS
 		//Convert the QW file date formats to JS format
-		person.eadFrom = convertDate(person['EAD From'], DATE_FORMAT.QW);
-		person.eadTo = convertDate(person['EAD To'], DATE_FORMAT.QW);
+		person.eadFrom = dateStringToJs(person['EAD From'], DATE_FORMAT.QW);
+		person.eadTo = dateStringToJs(person['EAD To'], DATE_FORMAT.QW);
 		//Convert the value to numeric - it reads in as text
 		person.daysInDep = +person['Days in DEP'];
 		//Give each person a unique ID
@@ -155,7 +156,7 @@ function preprocessJobs() {
 		let seats = +jobsRaw[i]['Seats Remaining']
 		for (j=0; j<seats; j++) {
 			jobs.push({
-				ead: convertDate(jobsRaw[i]['EAD'], DATE_FORMAT.JOBS),
+				ead: dateStringToJs(jobsRaw[i]['EAD'], DATE_FORMAT.JOBS),
 				afsc: jobsRaw[i]['AFSC'],
 				filledBy: undefined,
 				originalIndex: iJobs,
@@ -296,17 +297,6 @@ function matchJobs() {
 	}
 
 
-	// function sortJobs() {
-	// 	if (random) {
-	// 		jobs = shuffleArray(jobs);
-	// 	} else {
-	// 		jobs.sort((a,b) => {
-	// 			return a.possibleFills - b.possibleFills;
-	// 		});
-	// 	}
-	// }
-
-
 	function filterAndSortQw(qw, matchingEad, matchingAfsc) {
 		//Filter the qw to people that meet the criteria:
 		let qwFiltered = qw.filter((person) => {
@@ -352,7 +342,6 @@ function matchJobs() {
 		}
 	}
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 	matchingComplete = true;
 } // End match jobs
 
@@ -387,10 +376,19 @@ function createCsv() {
 }
 
 
-// Convert dates to JS format (this is a D3 function)
-function convertDate(dateInput, dateFormat) {
-	var dateParser = d3.timeParse(dateFormat);
-	return dateParser(dateInput);
+// Convert dates to JS format (dateParser is a D3 function)
+function dateStringToJs(dtInputString, dtFormat) {
+	let dateProcessor = d3.timeParse(dtFormat);
+	return dateProcessor(dtInputString);
+}
+
+function dateJsToString(dtInputJs, dtFormat) {
+	if (dtInputJs != undefined) {
+		let dateProcessor = d3.timeFormat(dtFormat);
+		return dateProcessor(dtInputJs);
+	} else {
+		return '';
+	}
 }
 
 
@@ -427,17 +425,20 @@ function updateDom() {
 	});
 
 	$.each(matches, (ind, match) => {
-		var msg;
-		var cl = 'list-group-item-';
-		if(match.jobInd !== undefined && match.qwInd !== undefined) {
-			// msg = 'Job ' + match.jobInd + ' matched to person ' + match.qwInd;
-			msg = 'Job ' + jobs[match.jobInd].afsc + ' matched to person ' + match.qwInd;
+		let msg;
+		let cl = 'list-group-item-';
+		let j = match.jobInd; let q = match.qwInd;
+		let dt = '';
+		if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
+
+		if(j !== undefined && q !== undefined) {
+			msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
 			cl += 'success';
-		} else if(match.jobInd !== undefined) {
-			msg = 'Job ' + match.jobInd + ' was not filled';
+		} else if(j !== undefined) {
+			msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
 			cl += 'danger';
-		} else if(match.qwInd !== undefined) {
-			msg = 'Person ' + match.qwInd + ' was not matched to a job';
+		} else if(q !== undefined) {
+			msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
 			cl += 'warning';
 		}
 

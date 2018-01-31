@@ -22,7 +22,7 @@
       <div class="container col-sm-5">
         <h1>AFRS Job Match Tool</h1>
         <p>
-          Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the <strong>Q&amp;W file from AFRISS</strong>, and the <strong>Open Jobs file from TTMS.</strong> It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
+          Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the <b>Q&amp;W file</b> from <b><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank">AFRISS</a></b>, and the <b>Open Jobs file</b> from <b><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank">TTMS</a></b>. It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
         </p>
       </div>
     </section>
@@ -36,20 +36,9 @@
 
       <div>
         <form method="post" enctype="multipart/form-data">
-          <label for="file-uploads">Add the Q&amp;W file and the Jobs file to begin job matching.</label>
+          <!-- <label for="file-uploads"><i class="ion-plus-round icon-md icon-add-files"></i>Add the Q&amp;W file and the Jobs file to begin job matching.</label> -->
+          <label for="file-uploads"><i class="ion-plus-circled icon-md icon-add-files"></i>Add the Q&amp;W file and the Jobs file to begin job matching.</label>
             <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
-
-<!--           <div class="file-preview">
-            <div class="d-inline">
-              <img id="notepad" class="icon-disabled" src="img/icon-notepad.png" alt="Excel">
-              <p id="qw-file-path">Q&amp;W</p>
-            </div>
-
-            <div class="d-inline">
-              <img id="excel" class="icon-disabled" src="img/icon-excel.png" alt="Notepad">              
-              <p id="jobs-file-path">Jobs</p>
-            </div>
-          </div> -->
         </form>
       </div>
 
@@ -126,7 +115,7 @@
 
           <div class="col">
             <ul class="ul-footer">
-              <li><a href="https://github.com/ganders3/jmt" target="blank"><i class="ion-social-github icon-sm icon-footer"></i><span class="icon-text">Job Match Tool on Github</span></a></li>
+              <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span class="icon-text">Job Match Tool on Github</span></a></li>
               <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
             </ul>
           </div>
