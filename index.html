@@ -23,14 +23,19 @@
         <h1>AFRS Job Match Tool</h1>
 
         <ul>
-          <li>&bull; Trim the initializing of scores array. Do it within the initialize function instead?</li>
+          <li>&bull; Trim down the initializing of scores array. Do it within the initialize function instead?</li>
           <li>&bull; Bar chart showing percentages matched - D3 clickable?</li>
           <li>&bull; Fix parse files function to account for newline \r\n vs \n</li>
           <li>&bull; Redesign file upload section - plus button, indicators for QW and Jobs</li>
         </ul>
 
         <p>
-          Welcome. This tool is intended to save you time by matching jobs to recruits. It only requires two files: the <b>Q&amp;W file</b> from <b><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank">AFRISS</a></b>, and the <b>Open Jobs file</b> from <b><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank">TTMS</a></b>. It will only match recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
+          Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:
+          <ul>
+            <li>&bull; <b>Q&amp;W file from AFRISS</b></li>
+            <li>&bull; <b>Open Jobs file from TTMS</b></li>
+          </ul>
+            The matching program will only assign recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
         </p>
       </div>
     </section>
@@ -59,23 +64,10 @@
 
       </div>
 
-
-        <!-- <div class="file-preview"> -->
-          <!-- <div class="d-inline"> -->
-            <!-- <img id="notepad" class="icon-disabled" src="img/icon-notepad.png" alt="Excel"> -->
-            <!-- <p id="qw-file-path"><i id="icon-qw" class="ion-person-stalker icon-md icon-disabled"></i> Q&amp;W</p> -->
-            <!-- <p id="jobs-file-path"><i id="icon-jobs" class="ion-document-text icon-md icon-disabled"></i> Jobs</p> -->
-          <!-- </div> -->
-
-          <!-- <div class="d-inline"> -->
-            <!-- <img id="excel" class="icon-disabled" src="img/icon-excel.png" alt="Notepad">               -->
-            <!-- <p id="jobs-file-path"><i id="icon-jobs" class="ion-document-text icon-md icon-disabled"></i> Jobs</p> -->
-          <!-- </div> -->
-        <!-- </div> -->
-      
       <div>
-        <button type="button" onclick="startProgram()" id="btn-run-jmt" class="btn btn-success">Run Job Match</button>
+        <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled="disabled">Run Job Match</button>
       </div>
+
     </section>
 
 
@@ -123,8 +115,16 @@
 
           <div class="col">
             <ul class="ul-footer">
-              <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span class="icon-text">Job Match Tool on Github</span></a></li>
+              <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span>Job Match Tool on Github</span></a></li>
               <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
+            </ul>
+          </div>
+
+          <div class="col">
+            <ul class="ul-footer">
+              <li><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank"><img src="img/logo-afriss.png" alt="AFRISS-TF" class="footer-logo"></a></li>
+              <br>
+              <li><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank"><img src="img/logo-ttms.png" alt="TTMS" class="footer-logo"></a></li>
             </ul>
           </div>
 
@@ -133,11 +133,10 @@
     </footer>
 
 
-
-
     <!-- xxxxxxxxxxxxxxxxxxxx Scripts xxxxxxxxxxxxxxxxxxxxxxxxxx -->
     <script src="vendor/js/d3.min.js"></script>
     <script src="vendor/js/jquery-3.3.1.js"></script>
+    <script src="vendor/js/xlsx.js"></script>
 
     <script src="app.js"></script>
     <script src="job-match.js"></script>

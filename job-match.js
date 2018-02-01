@@ -13,6 +13,7 @@ const KEEP_COLUMNS = {
 	QW: ['id', 'prefs', 'eadFrom', 'eadTo', 'daysInDep', 'selected', 'originalIndex', 'filledJob']
 }
 
+const SCORE_METHODS = ['equal', 'normalized', 'linear'];
 // var scores = {equal: {}, normalized: {}, linear: {}}
 var scores = {
 	equal: {
@@ -49,15 +50,12 @@ var scores = {
 	}
 }
 
-var qw = [];
-var jobs = [];
-var matches = [];
-var bestMatches = [];
 //====================================================================================
 
 
 function startProgram() {
-	initializeVariables();
+	programRunning = true;
+	resetVariables();
 	importData();
 
 	preprocessQw();
@@ -65,21 +63,27 @@ function startProgram() {
 	matchJobs();
 	logConsole();
 
-	// printResults();
-	updateDom();
 	createCsv();
+	updateDom();
 }
 
 function endProgram() {
-	initializeDom();
-	initializeVariables();
+	programRunning = false;
+	updateDom();
 }
 
 
-function initializeVariables() {
+function resetVariables() {
 	qw = [];
 	jobs = [];
 	matches = [];
+	bestMatches = [];
+
+	// scores = new Object;
+	// for (method in SCORE_METHODS) {
+	// 	scores.push({method: 1});
+	// }
+	// console.log(scores);
 
 	for (key in scores) {
 		scores[key].best.iteration = -1;
@@ -400,49 +404,6 @@ function logConsole() {
 }
 
 
-
-function updateDom() {
-
-	$('#sec-intro').hide('fast');
-	$('#sec-file-browse').hide('fast');
-	$('#sec-results').show('fast');
-
-	// Empty the html elements containing the list of matches and the results
-	$('#card-deck-scores').empty();
-	$('#match-list').empty();
-
-	$.each(scores, (ind, score) => {
-		$('#card-deck-scores').append(
-			'<div class="card">' + 
-				'<div class="card-block">' + 
-					'<h4 class="card-title">' + ind + '</h4>' +
-					'<p class="card-text">Best score: ' + score.best.score + '</p>' +
-					'<p class="card-text">Best iteration: ' + score.best.iteration + '</p>' +
-					'<p class="card-text">Best number matches: ' + score.best.numMatches + '</p>' +
-				'</div>' +
-			'</div>'
-			);
-	});
-
-	$.each(matches, (ind, match) => {
-		let msg;
-		let cl = 'list-group-item-';
-		let j = match.jobInd; let q = match.qwInd;
-		let dt = '';
-		if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
-
-		if(j !== undefined && q !== undefined) {
-			msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
-			cl += 'success';
-		} else if(j !== undefined) {
-			msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
-			cl += 'danger';
-		} else if(q !== undefined) {
-			msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
-			cl += 'warning';
-		}
-
-		$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
-		$('#match-list li').last().addClass(cl);
-	});
-}
+// function updateDom() {
+// 	updateDom2();
+// }

@@ -1,39 +1,93 @@
+var programRunning = false;
+// var initialize = true;
+
 var input = document.querySelector('input');
 var preview = document.querySelector('.file-preview');
 
 var qwString;
 var jobsString;
-// input.style.opacity = 0;
 
 input.addEventListener('change', handleFiles);
 //******************* figure out how to get IE to work when files are added ********************
 // input.attachEvent('onchange', handleFiles);
 
-// initializeDom();
-$(document).ready(() => {
-	initializeDom();
 
-	$('form').hover(function() {
-		// $('.icon-add-files').attr('style', 'color: #218838')
-		$('.icon-add-files').attr('style', 'opacity: 1')
-	}, function() {
-		// $('.icon-add-files').attr('style', 'color: #28a745');
-		$('.icon-add-files').attr('style', 'opacity: 0.65');
-	});
+// var wb = XLSX.read('data/test.xlsx');
+// console.log(wb);
+// var sheets = wb.SheetNames;
+// console.log(sheets);
+// console.log(XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]));
+
+
+$(document).ready(() => {
+	updateDom();
 });
 
 
-function initializeDom() {
-	$('#btn-run-jmt').attr({
-		disabled: 'disabled',
-		style: 'cursor: not-allowed'
-	});
-	// $('#btn-run-jmt').attr('style', 'cursor: not-allowed');
-	$('#sec-intro').show('fast');
-	$('#sec-file-browse').show('fast');
-	$('#sec-results').hide();
+function updateDom() {
+	if (!programRunning) {
+		$('#sec-intro, #sec-file-browse').show('fast');
+		$('#sec-results').hide();
+	} else {
+		$('#sec-intro, #sec-file-browse').hide('fast');
+		$('#sec-results').show('fast');
 
-	checkForRequiredFiles();
+		updateDomCards();
+		updateDomMatchList();
+	}
+	styleListener();
+
+
+	function updateDomCards() {
+		// Empty the html elements containing the list of matches and the results
+		$('#card-deck-scores, #match-list').empty();
+		$.each(scores, (ind, score) => {
+			$('#card-deck-scores').append(
+				'<div class="card">' + 
+					'<div class="card-block">' + 
+						'<h4 class="card-title">' + ind + '</h4>' +
+						'<p class="card-text">Best score: ' + score.best.score + '</p>' +
+						'<p class="card-text">Best iteration: ' + score.best.iteration + '</p>' +
+						'<p class="card-text">Best number matches: ' + score.best.numMatches + '</p>' +
+					'</div>' +
+				'</div>'
+				);
+		});
+	}
+
+	function updateDomMatchList() {
+		$.each(matches, (ind, match) => {
+			let msg;
+			let cl = 'list-group-item-';
+			let j = match.jobInd; let q = match.qwInd;
+			let dt = '';
+			if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
+
+			if(j !== undefined && q !== undefined) {
+				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
+				cl += 'success';
+			} else if(j !== undefined) {
+				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
+				cl += 'danger';
+			} else if(q !== undefined) {
+				msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
+				cl += 'warning';
+			}
+
+			$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
+			$('#match-list li').last().addClass(cl);
+		});
+	}
+
+	
+}
+
+function styleListener() {
+	$('form').hover(function() {
+		$('.icon-add-files').attr('style', 'opacity: 1')
+	}, function() {
+		$('.icon-add-files').attr('style', 'opacity: 0.65');
+	});
 }
 
 
@@ -43,18 +97,22 @@ function handleFiles() {
 }
 
 
+
 function readFiles() {	
 	var currentFiles = input.files;
 
 	for (i=0; i<currentFiles.length; i++) {
+		console.log(currentFiles[i].name);
+
 		if (validFileType(currentFiles[i])) {
 			let fileReader = new FileReader();
 
 			fileReader.onload = (fr) => {
+				// console.log(fr.target.result);
+				// XLSX.read(fr.target.result);
 				validFileContents(fr.target.result);
 				checkForRequiredFiles();
 			}
-
 			fileReader.readAsText(currentFiles[i]);
 		}
 	}
@@ -67,7 +125,7 @@ function validFileType(file) {
 		'.csv',
 		'text/csv',
 		'application/vnd.ms-excel',
-  // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 	];
 
 	for(var i = 0; i < FILE_TYPES.length; i++) {
@@ -94,20 +152,21 @@ function validFileContents(contents) {
 
 function checkForRequiredFiles() {
 	if(qwString && jobsString) {
-		$('#btn-run-jmt').removeAttr('disabled');
-		$('#btn-run-jmt').attr('style','cursor: pointer');
+		$('#btn-start').removeAttr('disabled');
+		$('#btn-start').attr('style','cursor: pointer');
 
 		$('.ion-plus-circled').addClass('ion-checkmark-round');
 		$('.ion-checkmark-round').removeClass('ion-plus-circled');
-
-		// $('.ion-plus-round').addClass('ion-checkmark-round');
-		// $('.ion-checkmark-round').removeClass('ion-plus-round');
 	}
 }
 
 function updateImageDisplay() {
 }
 
+
+function parseExcel(fname) {
+	XLSX.readFile(fname);
+}
 
 
 function parseDataString(string, delimiter, lineBreak, containsHeader) {
