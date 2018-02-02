@@ -7,8 +7,8 @@ The program requires a Q&W file from AFRISS and an Open Jobs file from TTMS.
 
 ## Planned improvements
 * Add bar charts showing the proportion of jobs/people matched and unmatched. Use D3 or base JS
-* Improve the parse files function
-  * indent Improve the parse files function to work on Linux (unnecessary in all likelihood, but for completeness)
-** double star
-  ** double star indent
+* Improve the parse files function:
+  * Read .xlsx files
+  * Check for invalid characters, headers, metadata, etc.
+  * Add compatibility on Linux - change \r\n to \n (unnecessary in all likelihood since recruiters will be using Windows, but for completeness)
 * Make the file upload section more user-friendly and intuitive
