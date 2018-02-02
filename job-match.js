@@ -63,7 +63,7 @@ function startProgram() {
 	matchJobs();
 	logConsole();
 
-	createCsv();
+	writeCsv(matches);
 	updateDom();
 }
 
@@ -78,12 +78,6 @@ function resetVariables() {
 	jobs = [];
 	matches = [];
 	bestMatches = [];
-
-	// scores = new Object;
-	// for (method in SCORE_METHODS) {
-	// 	scores.push({method: 1});
-	// }
-	// console.log(scores);
 
 	for (key in scores) {
 		scores[key].best.iteration = -1;
@@ -241,7 +235,6 @@ function matchJobs() {
 
 		//Append the matches array with all unmatched people
 		//Filter the qw to only unmatched people
-
 		let qwUnmatched = qw.filter((person) => {
 			return(person.filledJob.length == 0);
 		});
@@ -349,51 +342,6 @@ function matchJobs() {
 	matchingComplete = true;
 } // End match jobs
 
-
-function createCsv() {
-	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
-	var csvContent = CSV_METADATA;
-	//Append each row's data to the csv output data
-	bestMatches.forEach((row) => {
-		//Initialize current row content to a blank string
-		let rowContent = '';
-		//Loop through each key
-		for (key in row) {
-			//if the data headers have not yet been set (the only thing in the CSV is the metadata), set them now
-			if (csvContent == CSV_METADATA) {
-				rowContent += key + ',';
-			//If data headers have been set, start appending data
-			} else {
-				rowContent += row[key] + ',';
-			}
-		};
-		//Trim the last comma from the end of the row content
-		rowContent = rowContent.slice(0, rowContent.length-1);
-		//Append the current row content to the csv output
-		csvContent += rowContent + '\r\n';
-	});
-
-	let encodedUri = encodeURI(csvContent);
-	let link = document.getElementById('csv-link'); //document.createElement("a");
-	link.setAttribute("href", encodedUri);
-	link.setAttribute("download", "mydata.csv");
-}
-
-
-// Convert dates to JS format (dateParser is a D3 function)
-function dateStringToJs(dtInputString, dtFormat) {
-	let dateProcessor = d3.timeParse(dtFormat);
-	return dateProcessor(dtInputString);
-}
-
-function dateJsToString(dtInputJs, dtFormat) {
-	if (dtInputJs != undefined) {
-		let dateProcessor = d3.timeFormat(dtFormat);
-		return dateProcessor(dtInputJs);
-	} else {
-		return '';
-	}
-}
 
 
 function logConsole() {

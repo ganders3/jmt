@@ -207,3 +207,15 @@ ul {
 	opacity: 1;
 }
 
+#todo {
+	max-width: 50%;
+	margin: 1rem;
+	padding: 0.25rem;
+	font-size: 0.75rem;
+	border: 2px solid black;
+	border-radius: 1rem;	
+}
+
+#todo:hover {
+	background-color: #f3ecc0
+}

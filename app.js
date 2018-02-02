@@ -102,7 +102,7 @@ function readFiles() {
 	var currentFiles = input.files;
 
 	for (i=0; i<currentFiles.length; i++) {
-		console.log(currentFiles[i].name);
+		// console.log(currentFiles[i].name);
 
 		if (validFileType(currentFiles[i])) {
 			let fileReader = new FileReader();
@@ -200,7 +200,6 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 		}
 	});
 	return arr;
-
 }
 
 function fixFragmentedStrings(arr) {
@@ -229,4 +228,52 @@ function returnFileSize(number) {
   } else if(number > 1048576) {
     return (number/1048576).toFixed(1) + ' MB';
   }
+}
+
+function writeCsv(arr, fileName) {
+	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
+
+	//Append each row's data to the csv output data
+	var csvContent = CSV_METADATA;
+	arr.forEach((row) => {
+		//Initialize current row content to a blank string
+		let rowContent = '';
+		//Loop through each key
+		for (key in row) {
+			//if the data headers have not yet been set (the only thing in the CSV is the metadata), set them now
+			if (csvContent == CSV_METADATA) {
+				rowContent += key + ',';
+			//If data headers have been set, start appending data
+			} else {
+				rowContent += row[key] + ',';
+			}
+		};
+		//Trim the last comma from the end of the row content
+		rowContent = rowContent.slice(0, rowContent.length-1);
+		//Append the current row content to the csv output
+		csvContent += rowContent + '\r\n';
+	});
+
+	let encodedUri = encodeURI(csvContent);
+	let link = document.getElementById('csv-link'); //document.createElement("a");
+	link.setAttribute('href', encodedUri);
+
+	if (fileName===undefined){fileName = 'data.csv'}
+	if (!fileName.endsWith('.csv')){fileName += '.csv'}
+	link.setAttribute('download', fileName);
+}
+
+// Convert dates to JS format (dateParser is a D3 function)
+function dateStringToJs(dtInputString, dtFormat) {
+	let dateProcessor = d3.timeParse(dtFormat);
+	return dateProcessor(dtInputString);
+}
+
+function dateJsToString(dtInputJs, dtFormat) {
+	if (dtInputJs != undefined) {
+		let dateProcessor = d3.timeFormat(dtFormat);
+		return dateProcessor(dtInputJs);
+	} else {
+		return '';
+	}
 }
