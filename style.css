@@ -13,52 +13,12 @@ h1, h2 {
 	text-align: center;
 }
 
-
-form {
-	width: 50%;
-	padding: 0;
-	display: inline-block;
-	background-color: #fff;
-	border: 2px dashed #4da5fb;
-}
-
-form i:hover{
-	color: #218838;
-}
-
-form:hover {
-	/*color: #218838;*/
-	/*border: 3px dashed #4da5fb;*/
-	/*background-color: red;*/
-}
-
-
-label, input {
-	width: 100%;
-	cursor: pointer;
-}
-
-label {
-	height: 10rem;
-	padding: 5rem;
-	margin: 0;
-}
-
-input {
-	opacity: 0;
-}
-
-form img {
-  height: 2.5rem;
-  order: 1;
-}
-
-div {
-	/*margin-top: 1rem;*/
-}
-
 ul {
 	list-style: none;
+}
+
+.container {
+	align-content: center;
 }
 
 .section-1, .section-2 {
@@ -73,46 +33,9 @@ ul {
 	background-color: #eee;
 }
 
-#sec-intro {
-	text-align: justify;
-}
-
-#sec-file-browse {
-	/*align-content: center;*/
-	text-align: center;
-	align-content: center;
-}
-
-
-.file-preview ul {
-	overflow: hidden;
-}
-
-.file-preview ul li {
-	display: inline-block;
-	margin: 0 2rem;
-	/*float: left;*/
-}
-
-
-
-.file-preview img {
-	height: 3.5rem;
-	display: inline-block;
-	/*opacity: 0.3;*/
-	margin: 0 3rem;
-	/*padding: 10px;*/
-	/*margin: 10px 10px;*/
-	/*margin: 50px;*/
-}
-
 .btn-primary, .btn-secondary {
 	display: inline;
 	cursor: pointer;
-}
-
-#btn-start {
-	cursor: not-allowed;
 }
 
 .card-deck {
@@ -123,33 +46,66 @@ ul {
 	padding: 1rem;
 }
 
+
+#file-upload {
+	width: 50%;
+	min-width: 15rem;
+	padding: 0;
+	display: inline-block;
+	background-color: #fff;
+	border: 2px dashed #4da5fb;
+}
+
+#file-upload label, input {
+	width: 100%;
+	cursor: pointer;
+}
+
+#file-upload label {
+	margin: 0;
+}
+
+#file-upload input {
+	/*opacity: 0;*/
+}
+
+
+
+#sec-intro {
+	text-align: justify;
+	background: 
+}
+
+#sec-file-browse {
+	text-align: center;
+	align-content: center;
+}
+
+
+#btn-start {
+	cursor: not-allowed;
+}
+
+
 .icon-disabled {
 	opacity: 0.3;
 }
 
-.container {
-	/*color: red;*/
-	align-content: center;
-	/*padding: 100px;*/
-}
 
 .card-title {
 	text-transform: capitalize;
 }
 
 
-.page-footer {
-/*	background-color: #333;
-	color: #fff;*/
-}
 .footer {
 	width: 100%;
 	height: auto;
-	padding-top: 1rem;
+	padding: 1rem 0 0.5rem 0;
 	bottom: 0;
 	position: fixed;
 	background-color: #333;
 	color: #fff;
+	font-size: 1rem;
 }
 
 .icon-main {
@@ -202,7 +158,6 @@ ul {
 	opacity: 0.65;
 }
 
-
 .footer-logo:hover {
 	opacity: 1;
 }
@@ -218,4 +173,21 @@ ul {
 
 #todo:hover {
 	background-color: #f3ecc0
+}
+
+#card-deck-files {
+	width: 50%;
+	margin-bottom: 1rem;
+}
+
+.card-deck {
+	justify-content: center;
+}
+
+#card-deck-files .card {
+	max-width: 10rem;
+}
+
+.ion-close-round {
+	color: #d9534f;
 }

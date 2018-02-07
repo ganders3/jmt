@@ -24,7 +24,6 @@
         <li>&bull; Read from .xslx</li>
         <li>&bull; Bar chart showing percentages matched - D3 clickable?</li>
         <li>&bull; Trim down the initializing of scores array. Do it within the initialize function instead?</li>
-        <li>&bull; Fix parse files function to account for newline \r\n vs \n</li>
       </ul>
     </section>
 
@@ -33,14 +32,6 @@
       <div class="container col-sm-5">
         <h1>AFRS Job Match Tool</h1>
 
-<!--         <ul>
-          <li>&bull; Improve file upload UI - plus button, indicators for QW and Jobs</li>
-          <li>&bull; Read from .xslx</li>
-          <li>&bull; Bar chart showing percentages matched - D3 clickable?</li>
-          <li>&bull; Trim down the initializing of scores array. Do it within the initialize function instead?</li>
-          <li>&bull; Fix parse files function to account for newline \r\n vs \n</li>
-        </ul>
- -->
         <p>
           Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:
           <ul>
@@ -60,24 +51,44 @@
     <section id="sec-file-browse" class="section-2">
 
       <div>
-        <form method="post" enctype="multipart/form-data">
+        <form id="file-upload" method="post" enctype="multipart/form-data">
           <!-- <label for="file-uploads"><i class="ion-plus-round icon-md icon-add-files"></i>Add the Q&amp;W file and the Jobs file to begin job matching.</label> -->
-          <label for="file-uploads"><i class="ion-plus-circled icon-md icon-add-files"></i>Add the Q&amp;W file and the Jobs file to begin job matching.</label>
+          <label for="file-uploads"><i class="ion-plus-circled icon-md icon-add-files"></i></label>
             <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
         </form>
       </div>
 
 
+      <div class="card-deck mx-auto" id="card-deck-files">
+
+          <div class="card">
+            <div class="card-block">
+              <i class="ion-close-round icon-sm"></i>
+              <h6 class="card-title"><i id="icon-qw" class="ion-person-stalker icon-main icon-md icon-disabled"></i> Q&amp;W</h6>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-block">
+              <i class="ion-close-round icon-sm"></i>
+              <h6 class="card-title"><i id="icon-jobs" class="ion-document-text icon-main icon-md icon-disabled"></i> Jobs</h6>
+            </div>
+          </div>
+
+      </div>
+
+
+<!-- 
       <div class="file-preview">
         <ul class="ul-files">
           <li><i id="icon-qw" class="ion-person-stalker icon-main icon-md icon-disabled"></i> Q&amp;W</li>
           <li><i id="icon-jobs" class="ion-document-text icon-main icon-md icon-disabled"></i> Jobs</li>
         </ul>  
 
-      </div>
+      </div> -->
 
       <div>
-        <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled="disabled">Run Job Match</button>
+        <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled>Run Job Match</button>
       </div>
 
     </section>
@@ -121,8 +132,8 @@
 
           <div class="col">
             <span>
-              This website and the job matching algorithm were programmed by Greg Anderson. All code is free and open source.
-            </span>          
+              The code for this website and the job matching algorithm is free and open source.
+            </span>
           </div>
 
           <div class="col">

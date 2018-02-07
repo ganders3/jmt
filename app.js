@@ -25,6 +25,8 @@ $(document).ready(() => {
 
 
 function updateDom() {
+	$('#todo').hide();
+
 	if (!programRunning) {
 		$('#sec-intro, #sec-file-browse').show('fast');
 		$('#sec-results').hide();
@@ -36,6 +38,7 @@ function updateDom() {
 		updateDomMatchList();
 	}
 	styleListener();
+
 
 
 	function updateDomCards() {
@@ -98,7 +101,12 @@ function handleFiles() {
 
 
 
-function readFiles() {	
+function readFiles() {
+	const EXPECTED_CONTENTS = {
+		qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
+		jobs: ['AFSC', 'EAD', 'Seats Remaining']
+	}
+
 	var currentFiles = input.files;
 
 	for (i=0; i<currentFiles.length; i++) {
@@ -108,46 +116,64 @@ function readFiles() {
 			let fileReader = new FileReader();
 
 			fileReader.onload = (fr) => {
-				// console.log(fr.target.result);
+				console.log(fr.target.result);
 				// XLSX.read(fr.target.result);
+				checkFileContents(fr.target.result, EXPECTED_CONTENTS.qw);
+				checkFileContents(fr.target.result, EXPECTED_CONTENTS.jobs);
+
 				validFileContents(fr.target.result);
 				checkForRequiredFiles();
 			}
 			fileReader.readAsText(currentFiles[i]);
 		}
 	}
+
+	function validFileType(file) {
+		const FILE_TYPES = [
+			'.csv',
+			'text/csv',
+			'application/vnd.ms-excel',
+	  		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		];
+
+		for(var i = 0; i < FILE_TYPES.length; i++) {
+			// console.log(file.type)
+			if(file.type === FILE_TYPES[i]) {
+			  return true;
+			}
+		}
+		return false;
+	}
 	
 }
 
 
-function validFileType(file) {
-	const FILE_TYPES = [
-		'.csv',
-		'text/csv',
-		'application/vnd.ms-excel',
-  		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-	];
-
-	for(var i = 0; i < FILE_TYPES.length; i++) {
-		// console.log(file.type)
-		if(file.type === FILE_TYPES[i]) {
-		  return true;
-		}
-	}
-	return false;
-}
-
 
 function validFileContents(contents) {
 	if(contents.slice(0,4) === 'AFSC') {
+	// if(contents.slice(0,4) === 'Repo') {
 		jobsString = contents;
 		// $('#excel').removeClass('icon-disabled');
 		$('#icon-jobs').removeClass('icon-disabled');
-	} else if(contents.slice(0,4) === 'Prog') {
+	} else if(contents.slice(0,4) === 'Repo') {
+	// } else if(contents.slice(0,4) === 'Prog') {
 		qwString = contents;
 		// $('#notepad').removeClass('icon-disabled');
 		$('#icon-qw').removeClass('icon-disabled');
 	}
+}
+
+function checkFileContents(contents, expectedFields) {
+	expectedFields.forEach((field) => {
+		console.log(field + ': ' + (contents.search(field) === -1));
+		// console.log(contents.search(field));
+		if (contents.search(field) == -1) {
+			console.log(field);
+			return false;
+		}
+	});
+	// console.log('matching file!');
+
 }
 
 function checkForRequiredFiles() {
@@ -157,6 +183,10 @@ function checkForRequiredFiles() {
 
 		$('.ion-plus-circled').addClass('ion-checkmark-round');
 		$('.ion-checkmark-round').removeClass('ion-plus-circled');
+		// $('.ion-close-round').show();
+	} else {
+		// $('.ion-close-round').hide();
+		// $('#btn-start').attr('disabled');
 	}
 }
 
@@ -171,6 +201,8 @@ function parseExcel(fname) {
 
 function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Trim the string to remove any blanks, and then split it into lines based on the line break character
+	console.log('string:', string);
+	lineBreak = formatNewLineDelimiter(lineBreak);
 	var lines = string.trim().split(lineBreak);
 	var columnNames = [];
 
@@ -200,23 +232,35 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 		}
 	});
 	return arr;
-}
 
-function fixFragmentedStrings(arr) {
-	var fragmentedString = '';
-	arr.forEach((field, ind) => {
-		if(field.search('\"') !== -1) {
-			if(fragmentedString === '') {
-				fragmentedString += field.replace('\"', '') + ', ';
-			} else {
-				fragmentedString += field.replace('\"', '');
-				arr[ind-1] = fragmentedString;
-				arr.splice(ind, 1);
-				fragmentedString = '';
-			}
+
+
+	function formatNewLineDelimiter(delim) {
+		if (delim === '\r\n' || delim === '\n') {
+			if (getOs() === 'Windows') {
+				delim = '\r\n';
+			} else {delim = '\n';}
 		}
-	});
-	return arr;
+		return delim;
+	}
+
+	function fixFragmentedStrings(arr) {
+		var fragmentedString = '';
+		arr.forEach((field, ind) => {
+			if(field.search('\"') !== -1) {
+				if(fragmentedString === '') {
+					fragmentedString += field.replace('\"', '') + ', ';
+				} else {
+					fragmentedString += field.replace('\"', '');
+					arr[ind-1] = fragmentedString;
+					arr.splice(ind, 1);
+					fragmentedString = '';
+				}
+			}
+		});
+		return arr;
+	}
+
 }
 
 
@@ -276,4 +320,21 @@ function dateJsToString(dtInputJs, dtFormat) {
 	} else {
 		return '';
 	}
+}
+
+function getOs() {
+	let OS_LIST = [
+		{codeName: 'Windows', name: 'Windows'},
+		{codeName: 'Mac', name: 'Mac'},
+		{codeName: 'Linux', name: 'Linux'}
+	];
+
+	let os = navigator.oscpu;
+
+	for (i=0; i<OS_LIST.length; i++) {
+		if (os.search(OS_LIST[i].codeName) !== -1) {
+			return OS_LIST[i].name;
+		}
+	}
+	return 'Unknown';
 }
