@@ -350,8 +350,3 @@ function logConsole() {
 	console.log('matches:', matches);
 	console.log('scores:', scores);
 }
-
-
-// function updateDom() {
-// 	updateDom2();
-// }

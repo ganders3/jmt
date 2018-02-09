@@ -27,6 +27,7 @@ $(document).ready(() => {
 function updateDom() {
 	$('#todo').hide();
 
+
 	if (!programRunning) {
 		$('#sec-intro, #sec-file-browse').show('fast');
 		$('#sec-results').hide();
@@ -37,9 +38,19 @@ function updateDom() {
 		updateDomCards();
 		updateDomMatchList();
 	}
+	updateDomFiles();
 	styleListener();
 
 
+	function updateDomFiles() {
+		if (qwString !== undefined) {
+			$('#icon-qw').removeClass('icon-disabled');
+		} 
+
+		if (jobsString !== undefined) {
+			$('#icon-jobs').removeClass('icon-disabled');
+		}
+	}
 
 	function updateDomCards() {
 		// Empty the html elements containing the list of matches and the results
@@ -94,35 +105,23 @@ function styleListener() {
 }
 
 
+// if this function only contains one function, I can consolidate and remove it
 function handleFiles() {
 	readFiles();
-	updateImageDisplay();
 }
 
 
 
 function readFiles() {
-	const EXPECTED_CONTENTS = {
-		qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
-		jobs: ['AFSC', 'EAD', 'Seats Remaining']
-	}
-
 	var currentFiles = input.files;
 
 	for (i=0; i<currentFiles.length; i++) {
-		// console.log(currentFiles[i].name);
-
 		if (validFileType(currentFiles[i])) {
 			let fileReader = new FileReader();
 
 			fileReader.onload = (fr) => {
-				console.log(fr.target.result);
-				// XLSX.read(fr.target.result);
-				checkFileContents(fr.target.result, EXPECTED_CONTENTS.qw);
-				checkFileContents(fr.target.result, EXPECTED_CONTENTS.jobs);
-
-				validFileContents(fr.target.result);
-				checkForRequiredFiles();
+				checkForQwAndJobs(fr.target.result);
+				updateDom();
 			}
 			fileReader.readAsText(currentFiles[i]);
 		}
@@ -137,61 +136,36 @@ function readFiles() {
 		];
 
 		for(var i = 0; i < FILE_TYPES.length; i++) {
-			// console.log(file.type)
-			if(file.type === FILE_TYPES[i]) {
-			  return true;
-			}
+			if(file.type === FILE_TYPES[i]) {return true}
 		}
 		return false;
 	}
 	
 }
 
-
-
-function validFileContents(contents) {
-	if(contents.slice(0,4) === 'AFSC') {
-	// if(contents.slice(0,4) === 'Repo') {
-		jobsString = contents;
-		// $('#excel').removeClass('icon-disabled');
-		$('#icon-jobs').removeClass('icon-disabled');
-	} else if(contents.slice(0,4) === 'Repo') {
-	// } else if(contents.slice(0,4) === 'Prog') {
-		qwString = contents;
-		// $('#notepad').removeClass('icon-disabled');
-		$('#icon-qw').removeClass('icon-disabled');
+function checkForQwAndJobs(fileContents) {
+	// console.log('fileContents:', fileContents);
+	const EXPECTED_CONTENTS = {
+		qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
+		jobs: ['AFSC', 'EAD', 'Seats Remaining']
 	}
-}
 
-function checkFileContents(contents, expectedFields) {
-	expectedFields.forEach((field) => {
-		console.log(field + ': ' + (contents.search(field) === -1));
-		// console.log(contents.search(field));
-		if (contents.search(field) == -1) {
-			console.log(field);
-			return false;
-		}
-	});
-	// console.log('matching file!');
-
-}
-
-function checkForRequiredFiles() {
-	if(qwString && jobsString) {
-		$('#btn-start').removeAttr('disabled');
-		$('#btn-start').attr('style','cursor: pointer');
-
-		$('.ion-plus-circled').addClass('ion-checkmark-round');
-		$('.ion-checkmark-round').removeClass('ion-plus-circled');
-		// $('.ion-close-round').show();
-	} else {
-		// $('.ion-close-round').hide();
-		// $('#btn-start').attr('disabled');
+	if (checkFileContents(fileContents, EXPECTED_CONTENTS.qw)) {
+		qwString = fileContents;
+	} else if (checkFileContents(fileContents, EXPECTED_CONTENTS.jobs)) {
+		jobsString = fileContents;
 	}
+
 }
 
-function updateImageDisplay() {
+
+function checkFileContents(fileContents, expectedContents) {
+	for (i=0; i<expectedContents.length; i++) {
+		if (fileContents.search(expectedContents[i]) === -1) {return false}
+	}
+	return true;
 }
+
 
 
 function parseExcel(fname) {
@@ -199,9 +173,10 @@ function parseExcel(fname) {
 }
 
 
+
 function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Trim the string to remove any blanks, and then split it into lines based on the line break character
-	console.log('string:', string);
+	// console.log('string:', string);
 	lineBreak = formatNewLineDelimiter(lineBreak);
 	var lines = string.trim().split(lineBreak);
 	var columnNames = [];
@@ -264,19 +239,9 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 }
 
 
-function returnFileSize(number) {
-  if(number < 1024) {
-    return number + ' bytes';
-  } else if(number > 1024 && number < 1048576) {
-    return (number/1024).toFixed(1) + ' KB';
-  } else if(number > 1048576) {
-    return (number/1048576).toFixed(1) + ' MB';
-  }
-}
 
 function writeCsv(arr, fileName) {
 	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
-
 	//Append each row's data to the csv output data
 	var csvContent = CSV_METADATA;
 	arr.forEach((row) => {
@@ -299,7 +264,7 @@ function writeCsv(arr, fileName) {
 	});
 
 	let encodedUri = encodeURI(csvContent);
-	let link = document.getElementById('csv-link'); //document.createElement("a");
+	let link = document.getElementById('csv-link');
 	link.setAttribute('href', encodedUri);
 
 	if (fileName===undefined){fileName = 'data.csv'}
@@ -307,11 +272,16 @@ function writeCsv(arr, fileName) {
 	link.setAttribute('download', fileName);
 }
 
+
+
+
 // Convert dates to JS format (dateParser is a D3 function)
 function dateStringToJs(dtInputString, dtFormat) {
 	let dateProcessor = d3.timeParse(dtFormat);
 	return dateProcessor(dtInputString);
 }
+
+
 
 function dateJsToString(dtInputJs, dtFormat) {
 	if (dtInputJs != undefined) {
@@ -321,6 +291,10 @@ function dateJsToString(dtInputJs, dtFormat) {
 		return '';
 	}
 }
+
+
+
+
 
 function getOs() {
 	let OS_LIST = [
@@ -337,4 +311,17 @@ function getOs() {
 		}
 	}
 	return 'Unknown';
+}
+
+
+
+
+function returnFileSize(number) {
+	if(number < 1024) {
+		return number + ' bytes';
+	} else if(number > 1024 && number < 1048576) {
+		return (number/1024).toFixed(1) + ' KB';
+	} else if(number > 1048576) {
+		return (number/1048576).toFixed(1) + ' MB';
+	}
 }
