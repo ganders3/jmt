@@ -91,8 +91,10 @@ function resetVariables() {
 
 
 function importData() {
-	qwRaw = parseDataString(qwString, ',', '\r\n', true);
-	jobsRaw = parseDataString(jobsString, ',', '\r\n', true);
+	// qwRaw = parseDataString(qwString, ',', '\r\n', true);
+	qwRaw = parseDataString(dataStrings.qw, ',', '\r\n', true);
+	// jobsRaw = parseDataString(jobsString, ',', '\r\n', true);
+	jobsRaw = parseDataString(dataStrings.jobs, ',', '\r\n', true);
 }
 
 

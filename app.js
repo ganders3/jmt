@@ -1,8 +1,14 @@
+var initialize = true;
 var programRunning = false;
 // var initialize = true;
 
 var input = document.querySelector('input');
 var preview = document.querySelector('.file-preview');
+
+var dataStrings = {
+	qw: undefined,
+	jobs: undefined
+}
 
 var qwString;
 var jobsString;
@@ -21,38 +27,93 @@ input.addEventListener('change', handleFiles);
 
 $(document).ready(() => {
 	updateDom();
+	// styleListener();
 });
+
+
+
+function removeDataFile() {
+
+}
 
 
 function updateDom() {
 	$('#todo').hide();
 
-
-	if (!programRunning) {
-		$('#sec-intro, #sec-file-browse').show('fast');
-		$('#sec-results').hide();
-	} else {
-		$('#sec-intro, #sec-file-browse').hide('fast');
-		$('#sec-results').show('fast');
-
-		updateDomCards();
-		updateDomMatchList();
-	}
-	updateDomFiles();
+	showSections();
 	styleListener();
 
-
-	function updateDomFiles() {
-		if (qwString !== undefined) {
-			$('#icon-qw').removeClass('icon-disabled');
-		} 
-
-		if (jobsString !== undefined) {
-			$('#icon-jobs').removeClass('icon-disabled');
+	function showSections() {
+		if (!programRunning) {
+			$('#sec-intro, #sec-file-browse').show('fast');
+			$('#sec-results').hide();
+			updateDomFiles();
+		} else {
+			$('#sec-intro, #sec-file-browse').hide('fast');
+			$('#sec-results').show('fast');
+			domSummaryCards();
+			updateDomMatchList();
 		}
 	}
 
-	function updateDomCards() {
+
+
+	function updateDomFiles() {
+		// if (qwString !== undefined) {
+		if (dataStrings.qw !== undefined) {
+			$('#icon-qw').removeClass('icon-disabled');
+		}
+
+		if (dataStrings.jobs !== undefined) {
+		// if (jobsString !== undefined) {
+			$('#icon-jobs').removeClass('icon-disabled');
+		}
+
+		// if (qwString !== undefined && jobsString !== undefined) {
+		if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
+			$('#btn-start').removeAttr('disabled');
+			$('#btn-start').removeClass('btn-disabled');
+		} else {
+			$('#btn-start').attr('disabled','disabled');
+			$('#btn-start').addClass('btn-disabled');
+		}
+		setCards();
+
+		function setCards() {
+			$('#card-deck-files').empty();
+
+			for (var i in dataStrings) {
+				let ionClass;
+				switch (i) {
+					case 'qw': ionClass = 'ion-person-stalker';
+					case 'jobs': ionClass = 'ion-document-text';
+					default: '';
+				}
+
+				$('#card-deck-files').append(
+					'<div class="card">' +
+						'<div class="card-block">' +
+							'<i class="ion-close-round icon-sm id="icon-close-' + i + '"></i>' +
+							'<h6 class="card-title"><i id="icon-' + i + '" class="' + ionClass + ' icon-main icon-md icon-disabled"></i>' + i + '</h6>' +
+						'</div>' +
+					'</div>'
+					);
+
+				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
+				if (dataStrings[i] !== undefined) {
+					$('#icon-' + i).removeClass('icon-disabled');
+				} else {
+					$('#icon-' + i).addClass('icon-disabled');
+				}
+			}
+		}
+	}
+
+
+
+
+
+	function domSummaryCards() {
 		// Empty the html elements containing the list of matches and the results
 		$('#card-deck-scores, #match-list').empty();
 		$.each(scores, (ind, score) => {
@@ -68,6 +129,8 @@ function updateDom() {
 				);
 		});
 	}
+
+
 
 	function updateDomMatchList() {
 		$.each(matches, (ind, match) => {
@@ -93,16 +156,25 @@ function updateDom() {
 		});
 	}
 
-	
-}
 
-function styleListener() {
-	$('form').hover(function() {
-		$('.icon-add-files').attr('style', 'opacity: 1')
-	}, function() {
-		$('.icon-add-files').attr('style', 'opacity: 0.65');
+
+	function styleListener() {
+		$('form').hover(function() {
+			$('.icon-add-files').attr('style', 'opacity: 1')
+		}, function() {
+			$('.icon-add-files').attr('style', 'opacity: 0.65');
+		});
+	}
+
+	//-------------------------------click is not working----------------------------------
+	//-------------------------------click is not working----------------------------------
+	//-------------------------------click is not working----------------------------------
+	$('#icon-close-qw').click(function() {
+		console.log('click');
 	});
 }
+
+
 
 
 // if this function only contains one function, I can consolidate and remove it
@@ -151,9 +223,11 @@ function checkForQwAndJobs(fileContents) {
 	}
 
 	if (checkFileContents(fileContents, EXPECTED_CONTENTS.qw)) {
-		qwString = fileContents;
+		// qwString = fileContents;
+		dataStrings.qw = fileContents;
 	} else if (checkFileContents(fileContents, EXPECTED_CONTENTS.jobs)) {
-		jobsString = fileContents;
+		dataStrings.jobs = fileContents;
+		// jobsString = fileContents;
 	}
 
 }

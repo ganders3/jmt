@@ -33,7 +33,7 @@ ul {
 	background-color: #eee;
 }
 
-.btn-primary, .btn-secondary {
+.btn, .btn-primary, .btn-secondary {
 	display: inline;
 	cursor: pointer;
 }
@@ -83,14 +83,18 @@ ul {
 
 
 #btn-start {
+	/*cursor: not-allowed;*/
+}
+
+
+.icon-disabled, .btn-disabled {
+	opacity: 0.3;
+	/*cursor: not-allowed;*/
+}
+
+.btn-disabled {
 	cursor: not-allowed;
 }
-
-
-.icon-disabled {
-	opacity: 0.3;
-}
-
 
 .card-title {
 	text-transform: capitalize;
