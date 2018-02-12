@@ -13,9 +13,10 @@ var dataStrings = {
 var qwString;
 var jobsString;
 
-input.addEventListener('change', handleFiles);
+input.addEventListener('change', readFiles);
 //******************* figure out how to get IE to work when files are added ********************
 // input.attachEvent('onchange', handleFiles);
+
 
 
 // var wb = XLSX.read('data/test.xlsx');
@@ -27,30 +28,22 @@ input.addEventListener('change', handleFiles);
 
 $(document).ready(() => {
 	updateDom();
-	// styleListener();
 });
 
 
 
-function removeDataFile() {
-
-}
-
 
 function updateDom() {
-	$('#todo').hide();
-
 	showSections();
 	styleListener();
 
 	function showSections() {
+		$('#sec-intro, #sec-file-browse').toggle(!programRunning);
+		$('#sec-results').toggle(programRunning);
+		
 		if (!programRunning) {
-			$('#sec-intro, #sec-file-browse').show('fast');
-			$('#sec-results').hide();
 			updateDomFiles();
 		} else {
-			$('#sec-intro, #sec-file-browse').hide('fast');
-			$('#sec-results').show('fast');
 			domSummaryCards();
 			updateDomMatchList();
 		}
@@ -59,17 +52,7 @@ function updateDom() {
 
 
 	function updateDomFiles() {
-		// if (qwString !== undefined) {
-		if (dataStrings.qw !== undefined) {
-			$('#icon-qw').removeClass('icon-disabled');
-		}
 
-		if (dataStrings.jobs !== undefined) {
-		// if (jobsString !== undefined) {
-			$('#icon-jobs').removeClass('icon-disabled');
-		}
-
-		// if (qwString !== undefined && jobsString !== undefined) {
 		if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
 			$('#btn-start').removeAttr('disabled');
 			$('#btn-start').removeClass('btn-disabled');
@@ -79,33 +62,34 @@ function updateDom() {
 		}
 		setCards();
 
+
 		function setCards() {
 			$('#card-deck-files').empty();
 
-			for (var i in dataStrings) {
+			Object.keys(dataStrings).forEach((ds) => {
+
 				let ionClass;
-				switch (i) {
-					case 'qw': ionClass = 'ion-person-stalker';
-					case 'jobs': ionClass = 'ion-document-text';
-					default: '';
-				}
+				if (ds === 'qw') {ionClass = 'ion-person-stalker';}
+				if (ds === 'jobs') {ionClass = 'ion-document-text';}
 
 				$('#card-deck-files').append(
 					'<div class="card">' +
 						'<div class="card-block">' +
-							'<i class="ion-close-round icon-sm id="icon-close-' + i + '"></i>' +
-							'<h6 class="card-title"><i id="icon-' + i + '" class="' + ionClass + ' icon-main icon-md icon-disabled"></i>' + i + '</h6>' +
+							'<div><i class="ion-close-round icon-sm icon-click" id="icon-close-' + ds + '"></i></div>' +
+							'<i id="icon-' + ds + '" class="' + ionClass + ' icon-main icon-sm icon-disabled"></i><h6 class="card-title">' + ds + '</h6>' +
 						'</div>' +
 					'</div>'
 					);
 
 				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
-				if (dataStrings[i] !== undefined) {
-					$('#icon-' + i).removeClass('icon-disabled');
+				if (dataStrings[ds] !== undefined) {
+					$('#icon-' + ds).removeClass('icon-disabled');
+					$('#icon-close-' + ds).toggle(true);
 				} else {
-					$('#icon-' + i).addClass('icon-disabled');
+					$('#icon-' + ds).addClass('icon-disabled');
+					$('#icon-close-' + ds).toggle(false);
 				}
-			}
+			});
 		}
 	}
 
@@ -135,24 +119,24 @@ function updateDom() {
 	function updateDomMatchList() {
 		$.each(matches, (ind, match) => {
 			let msg;
-			let cl = 'list-group-item-';
+			let itemClass = 'list-group-item-';
 			let j = match.jobInd; let q = match.qwInd;
 			let dt = '';
 			if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
 
 			if(j !== undefined && q !== undefined) {
 				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
-				cl += 'success';
+				itemClass += 'success';
 			} else if(j !== undefined) {
 				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
-				cl += 'danger';
+				itemClass += 'danger';
 			} else if(q !== undefined) {
 				msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
-				cl += 'warning';
+				itemClass += 'warning';
 			}
 
 			$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
-			$('#match-list li').last().addClass(cl);
+			$('#match-list li').last().addClass(itemClass);
 		});
 	}
 
@@ -160,27 +144,30 @@ function updateDom() {
 
 	function styleListener() {
 		$('form').hover(function() {
-			$('.icon-add-files').attr('style', 'opacity: 1')
+			$('#icon-add-files').attr('style', 'opacity: 1')
 		}, function() {
-			$('.icon-add-files').attr('style', 'opacity: 0.65');
+			$('#icon-add-files').attr('style', 'opacity: 0.65');
 		});
+
+
+		$('.icon-click').hover(function() {
+			$(this).attr('style', 'opacity: 1');
+		}, function() {
+			$(this).attr('style', 'opacity: 0.65');
+		});
+	
+		$('[id ^= icon-close-]').click(function() {
+			dataStrings[this.id.replace('icon-close-', '')] = undefined;
+		});
+
+		// updateDomFiles();
+		// setCards();
+	
 	}
 
-	//-------------------------------click is not working----------------------------------
-	//-------------------------------click is not working----------------------------------
-	//-------------------------------click is not working----------------------------------
-	$('#icon-close-qw').click(function() {
-		console.log('click');
-	});
-}
 
+} //End updateDom
 
-
-
-// if this function only contains one function, I can consolidate and remove it
-function handleFiles() {
-	readFiles();
-}
 
 
 
