@@ -34,40 +34,27 @@ $(document).ready(() => {
 
 
 function updateDom() {
-	showSections();
+
+	build();
+	style();
+	show();
 	styleListener();
 
-	function showSections() {
-		$('#sec-intro, #sec-file-browse').toggle(!programRunning);
-		$('#sec-results').toggle(programRunning);
-		
-		if (!programRunning) {
-			updateDomFiles();
-		} else {
-			domSummaryCards();
-			updateDomMatchList();
-		}
-	}
+
+
+	function build() {
+
+		buildFileUpload();
+		buildScores();
+		buildMatches();
 
 
 
-	function updateDomFiles() {
 
-		if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
-			$('#btn-start').removeAttr('disabled');
-			$('#btn-start').removeClass('btn-disabled');
-		} else {
-			$('#btn-start').attr('disabled','disabled');
-			$('#btn-start').addClass('btn-disabled');
-		}
-		setCards();
-
-
-		function setCards() {
+		function buildFileUpload() {
 			$('#card-deck-files').empty();
 
 			Object.keys(dataStrings).forEach((ds) => {
-
 				let ionClass;
 				if (ds === 'qw') {ionClass = 'ion-person-stalker';}
 				if (ds === 'jobs') {ionClass = 'ion-document-text';}
@@ -80,64 +67,87 @@ function updateDom() {
 						'</div>' +
 					'</div>'
 					);
-
-				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
-				if (dataStrings[ds] !== undefined) {
-					$('#icon-' + ds).removeClass('icon-disabled');
-					$('#icon-close-' + ds).toggle(true);
-				} else {
-					$('#icon-' + ds).addClass('icon-disabled');
-					$('#icon-close-' + ds).toggle(false);
-				}
 			});
+		}
+
+
+
+		function buildScores() {
+			// Empty the html elements containing the list of matches and the results
+			$('#card-deck-scores, #match-list').empty();
+
+			if (typeof(scores) !== 'undefined') {
+				$.each(scores, (ind, score) => {
+					$('#card-deck-scores').append(
+						'<div class="card">' + 
+							'<div class="card-block">' + 
+								'<h4 class="card-title">' + ind + '</h4>' +
+								'<p class="card-text">Best score: ' + score.best.score + '</p>' +
+								'<p class="card-text">Best iteration: ' + score.best.iteration + '</p>' +
+								'<p class="card-text">Best number matches: ' + score.best.numMatches + '</p>' +
+							'</div>' +
+						'</div>'
+						);
+				});				
+			}
+		}
+
+
+
+		function buildMatches() {
+			if (typeof(matches) !== 'undefined') {
+				$.each(matches, (ind, match) => {
+					let msg;
+					let itemClass = 'list-group-item-';
+					let j = match.jobInd; let q = match.qwInd;
+					let dt = '';
+					if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
+
+					if(j !== undefined && q !== undefined) {
+						msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
+						itemClass += 'success';
+					} else if(j !== undefined) {
+						msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
+						itemClass += 'danger';
+					} else if(q !== undefined) {
+						msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
+						itemClass += 'warning';
+					}
+
+					$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
+					$('#match-list li').last().addClass(itemClass);
+				});
+			}
+		}
+
+
+	}
+
+	function style() {
+
+		Object.keys(dataStrings).forEach((ds) => {
+			let fileLoaded = dataStrings[ds] !== undefined;
+			//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
+			$('#icon-' + ds).toggleClass('icon-disabled', !fileLoaded);
+			$('#icon-close-' + ds).toggle(fileLoaded);
+		});
+
+		
+		if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
+			$('#btn-start').removeAttr('disabled');
+			$('#btn-start').removeClass('btn-disabled');
+		} else {
+			$('#btn-start').attr('disabled','disabled');
+			$('#btn-start').addClass('btn-disabled');
 		}
 	}
 
 
 
 
-
-	function domSummaryCards() {
-		// Empty the html elements containing the list of matches and the results
-		$('#card-deck-scores, #match-list').empty();
-		$.each(scores, (ind, score) => {
-			$('#card-deck-scores').append(
-				'<div class="card">' + 
-					'<div class="card-block">' + 
-						'<h4 class="card-title">' + ind + '</h4>' +
-						'<p class="card-text">Best score: ' + score.best.score + '</p>' +
-						'<p class="card-text">Best iteration: ' + score.best.iteration + '</p>' +
-						'<p class="card-text">Best number matches: ' + score.best.numMatches + '</p>' +
-					'</div>' +
-				'</div>'
-				);
-		});
-	}
-
-
-
-	function updateDomMatchList() {
-		$.each(matches, (ind, match) => {
-			let msg;
-			let itemClass = 'list-group-item-';
-			let j = match.jobInd; let q = match.qwInd;
-			let dt = '';
-			if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
-
-			if(j !== undefined && q !== undefined) {
-				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
-				itemClass += 'success';
-			} else if(j !== undefined) {
-				msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
-				itemClass += 'danger';
-			} else if(q !== undefined) {
-				msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
-				itemClass += 'warning';
-			}
-
-			$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
-			$('#match-list li').last().addClass(itemClass);
-		});
+	function show() {
+		$('#sec-intro, #sec-file-browse').toggle(!programRunning);
+		$('#sec-results').toggle(programRunning);
 	}
 
 
@@ -159,10 +169,6 @@ function updateDom() {
 		$('[id ^= icon-close-]').click(function() {
 			dataStrings[this.id.replace('icon-close-', '')] = undefined;
 		});
-
-		// updateDomFiles();
-		// setCards();
-	
 	}
 
 
