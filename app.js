@@ -10,8 +10,8 @@ var dataStrings = {
 	jobs: undefined
 }
 
-var qwString;
-var jobsString;
+// var qwString;
+// var jobsString;
 
 input.addEventListener('change', readFiles);
 //******************* figure out how to get IE to work when files are added ********************
@@ -28,7 +28,9 @@ input.addEventListener('change', readFiles);
 
 $(document).ready(() => {
 	updateDom();
+	listen();
 });
+
 
 
 
@@ -38,8 +40,6 @@ function updateDom() {
 	build();
 	style();
 	show();
-	styleListener();
-
 
 
 	function build() {
@@ -47,9 +47,6 @@ function updateDom() {
 		buildFileUpload();
 		buildScores();
 		buildMatches();
-
-
-
 
 		function buildFileUpload() {
 			$('#card-deck-files').empty();
@@ -143,36 +140,61 @@ function updateDom() {
 	}
 
 
-
-
 	function show() {
 		$('#sec-intro, #sec-file-browse').toggle(!programRunning);
 		$('#sec-results').toggle(programRunning);
 	}
 
-
-
-	function styleListener() {
-		$('form').hover(function() {
-			$('#icon-add-files').attr('style', 'opacity: 1')
-		}, function() {
-			$('#icon-add-files').attr('style', 'opacity: 0.65');
-		});
-
-
-		$('.icon-click').hover(function() {
-			$(this).attr('style', 'opacity: 1');
-		}, function() {
-			$(this).attr('style', 'opacity: 0.65');
-		});
-	
-		$('[id ^= icon-close-]').click(function() {
-			dataStrings[this.id.replace('icon-close-', '')] = undefined;
-		});
-	}
-
-
 } //End updateDom
+
+
+
+
+
+function listen() {
+
+	$('form').on('mouseenter', function() {
+		$('#icon-add-files').attr('style', 'opacity: 1');
+	});
+
+	$('form').on('mouseleave', function() {
+		$('#icon-add-files').attr('style', 'opacity: 0.6');
+	});
+
+	// $('.icon-click').each(function() {
+	// 	$(this).on('mouseenter', function() {
+	// 		console.log('mouse on each');
+	// 	})
+	// });
+
+	$('#icon-close-qw').on('mouseenter', function() {
+		// console.log('enter qw');
+	});
+
+	// $('.icon-click').on('mouseenter', function() {
+	// 	console.log('mouse on icon click');
+	// 	// $(this).attr('style', 'opacity: 1');
+	// });
+
+	// $('.icon-click').on('mouseleave', function() {
+	// 	console.log('mouse off icon click');
+	// 	$(this).attr('style', 'opacity: 0.6');
+	// });
+
+
+	// $('[id ^= icon-close-]').click(function() {
+	// 	dataStrings[this.id.replace('icon-close-', '')] = undefined;
+	// });
+
+	$('#btn-start, .icon-click').on('mouseenter', function() {
+		// console.log('cheese');
+	});
+
+
+
+	// updateDom();
+}
+
 
 
 
@@ -204,9 +226,9 @@ function readFiles() {
 			if(file.type === FILE_TYPES[i]) {return true}
 		}
 		return false;
-	}
-	
+	}	
 }
+
 
 function checkForQwAndJobs(fileContents) {
 	// console.log('fileContents:', fileContents);
@@ -240,6 +262,73 @@ function parseExcel(fname) {
 }
 
 
+function prepareDataString(string, delimiter, lineBreak, containsHeader) {
+
+		// 	qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
+		// jobs: ['AFSC', 'EAD', 'Seats Remaining']
+
+		//Program Display	RIC	Applicant	ED Code MEPS	SSAN	DEP Date	Days in DEP	EAD From	EAD To	Sex	SJC	MEPS	
+		//AFSC Pref 1	AFSC Pref 2	AFSC Pref 3	AFSC Pref 4	AFSC Pref 5	AFSC Pref 6	AFSC Pref 7	AFSC Pref 8	AFSC Pref 9	AFSC Pref 10	AFSC Pref 11	
+		//AFSC Pref 12	AFSC Pref 13	AFSC Pref 14	AFSC Pref 15	AFSC Pref 16	AFSC Pref 17	AFSC Pref 18	AFSC Pref 19	AFSC Pref 20	
+		//ASVAB QT	ASVAB M	ASVAB A	ASVAB G	ASVAB E
+		// qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
+		// jobs: ['AFSC', 'EAD', 'Seats Remaining']
+
+	const EXPECTED_HEADERS = {
+		qw: [
+			{name: 'Program Display', required: false, canBeBlank: false},
+			{name: 'RIC', required: false, canBeBlank: false},
+			{name: 'Applicant', required: false, canBeBlank: false},
+			{name: 'ED Code MEPS', required: false, canBeBlank: false},
+			{name: 'SSAN', required: true, canBeBlank: false},
+			{name: 'DEP Date', required: true, canBeBlank: false},
+			{name: 'Days in DEP', required: true, canBeBlank: false},
+			{name: 'EAD From', required: true, canBeBlank: false},
+			{name: 'EAD To', required: true, canBeBlank: false},
+			{name: 'Sex', required: false, canBeBlank: false},
+			{name: 'SJC', required: false, canBeBlank: false},
+			{name: 'MEPS', required: false, canBeBlank: false},
+			{name: 'AFSC Pref 1', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 2', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 3', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 4', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 5', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 6', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 7', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 8', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 9', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 10', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 11', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 12', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 13', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 14', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 15', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 16', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 17', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 18', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 19', required: true, canBeBlank: false},
+			{name: 'AFSC Pref 20', required: true, canBeBlank: false},
+			{name: 'ASVAB QT', required: false, canBeBlank: false},
+			{name: 'ASVAB M', required: false, canBeBlank: false},
+			{name: 'ASVAB A', required: false, canBeBlank: false},
+			{name: 'ASVAB G', required: false, canBeBlank: false},
+			{name: 'ASVAB E', required: false, canBeBlank: false}
+		],
+
+		jobs: [
+
+		]
+	}
+
+	lineBreak = formatNewLineDelimiter(lineBreak);
+
+	function isHeaderLine() {
+
+	}
+
+}
+
+
 
 function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Trim the string to remove any blanks, and then split it into lines based on the line break character
@@ -247,6 +336,14 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	lineBreak = formatNewLineDelimiter(lineBreak);
 	var lines = string.trim().split(lineBreak);
 	var columnNames = [];
+
+	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+	console.log(lines[0], lines[0].length);
+	// console.log('lines:', lines);
 
 	//Set the object property names depending on whether the csv string has headers or not
 	if(containsHeader) {
@@ -264,6 +361,8 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Iterate through each line in the data string
 	var arr = [];
 	lines.forEach((line) => {
+		console.log(line);
+
 		//Split each line by commas to get an array of each entry
 		var fields = line.split(delimiter);
 		fields = fixFragmentedStrings(fields)

@@ -58,13 +58,13 @@ function startProgram() {
 	resetVariables();
 	importData();
 
-	preprocessQw();
-	preprocessJobs();
-	matchJobs();
-	logConsole();
+	// preprocessQw();
+	// preprocessJobs();
+	// matchJobs();
+	// logConsole();
 
-	writeCsv(matches);
-	updateDom();
+	// writeCsv(matches);
+	// updateDom();
 }
 
 function endProgram() {
@@ -91,10 +91,13 @@ function resetVariables() {
 
 
 function importData() {
-	// qwRaw = parseDataString(qwString, ',', '\r\n', true);
 	qwRaw = parseDataString(dataStrings.qw, ',', '\r\n', true);
-	// jobsRaw = parseDataString(jobsString, ',', '\r\n', true);
+	// qw = parseDataString(dataStrings.qw, ',', '\r\n', true);
 	jobsRaw = parseDataString(dataStrings.jobs, ',', '\r\n', true);
+	// jobs = parseDataString(dataStrings.jobs, ',', '\r\n', true);
+
+	console.log('qwRaw:', qwRaw);
+	console.log('jobsRaw:', jobsRaw);
 }
 
 
