@@ -39,7 +39,6 @@ function updateDom() {
 
 	build();
 	style();
-	show();
 
 
 	function build() {
@@ -120,30 +119,40 @@ function updateDom() {
 
 	}
 
+
 	function style() {
 
-		Object.keys(dataStrings).forEach((ds) => {
-			let fileLoaded = dataStrings[ds] !== undefined;
-			//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
-			$('#icon-' + ds).toggleClass('icon-disabled', !fileLoaded);
-			$('#icon-close-' + ds).toggle(fileLoaded);
-		});
+		styleIcons();
+		styleButtons();
+		showSections();
 
+
+		function styleIcons() {
+			Object.keys(dataStrings).forEach((ds) => {
+				let fileLoaded = dataStrings[ds] !== undefined;
+				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
+				$('#icon-' + ds).toggleClass('icon-disabled', !fileLoaded);
+				$('#icon-close-' + ds).toggle(fileLoaded);
+			});
+		}
 		
-		if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
-			$('#btn-start').removeAttr('disabled');
-			$('#btn-start').removeClass('btn-disabled');
-		} else {
-			$('#btn-start').attr('disabled','disabled');
-			$('#btn-start').addClass('btn-disabled');
+		function styleButtons() {
+			if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
+				$('#btn-start').removeAttr('disabled');
+				$('#btn-start').removeClass('btn-disabled');
+			} else {
+				$('#btn-start').attr('disabled','disabled');
+				$('#btn-start').addClass('btn-disabled');
+			}
+		}
+
+		function showSections() {
+			$('#sec-intro, #sec-file-browse').toggle(!programRunning);
+			$('#sec-results').toggle(programRunning);
 		}
 	}
 
 
-	function show() {
-		$('#sec-intro, #sec-file-browse').toggle(!programRunning);
-		$('#sec-results').toggle(programRunning);
-	}
 
 } //End updateDom
 
@@ -261,73 +270,112 @@ function parseExcel(fname) {
 	XLSX.readFile(fname);
 }
 
-
-function prepareDataString(string, delimiter, lineBreak, containsHeader) {
-
-		// 	qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
-		// jobs: ['AFSC', 'EAD', 'Seats Remaining']
-
-		//Program Display	RIC	Applicant	ED Code MEPS	SSAN	DEP Date	Days in DEP	EAD From	EAD To	Sex	SJC	MEPS	
-		//AFSC Pref 1	AFSC Pref 2	AFSC Pref 3	AFSC Pref 4	AFSC Pref 5	AFSC Pref 6	AFSC Pref 7	AFSC Pref 8	AFSC Pref 9	AFSC Pref 10	AFSC Pref 11	
-		//AFSC Pref 12	AFSC Pref 13	AFSC Pref 14	AFSC Pref 15	AFSC Pref 16	AFSC Pref 17	AFSC Pref 18	AFSC Pref 19	AFSC Pref 20	
-		//ASVAB QT	ASVAB M	ASVAB A	ASVAB G	ASVAB E
-		// qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
-		// jobs: ['AFSC', 'EAD', 'Seats Remaining']
-
 	const EXPECTED_HEADERS = {
 		qw: [
-			{name: 'Program Display', required: false, canBeBlank: false},
-			{name: 'RIC', required: false, canBeBlank: false},
-			{name: 'Applicant', required: false, canBeBlank: false},
-			{name: 'ED Code MEPS', required: false, canBeBlank: false},
-			{name: 'SSAN', required: true, canBeBlank: false},
-			{name: 'DEP Date', required: true, canBeBlank: false},
-			{name: 'Days in DEP', required: true, canBeBlank: false},
-			{name: 'EAD From', required: true, canBeBlank: false},
-			{name: 'EAD To', required: true, canBeBlank: false},
-			{name: 'Sex', required: false, canBeBlank: false},
-			{name: 'SJC', required: false, canBeBlank: false},
-			{name: 'MEPS', required: false, canBeBlank: false},
-			{name: 'AFSC Pref 1', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 2', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 3', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 4', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 5', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 6', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 7', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 8', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 9', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 10', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 11', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 12', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 13', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 14', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 15', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 16', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 17', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 18', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 19', required: true, canBeBlank: false},
-			{name: 'AFSC Pref 20', required: true, canBeBlank: false},
-			{name: 'ASVAB QT', required: false, canBeBlank: false},
-			{name: 'ASVAB M', required: false, canBeBlank: false},
-			{name: 'ASVAB A', required: false, canBeBlank: false},
-			{name: 'ASVAB G', required: false, canBeBlank: false},
-			{name: 'ASVAB E', required: false, canBeBlank: false}
+			{name: 'SSAN', canBeBlank: false},
+			{name: 'Days in DEP', canBeBlank: false},
+			{name: 'EAD From', canBeBlank: false},
+			{name: 'EAD To', canBeBlank: false},
+			{name: 'AFSC Pref 1', canBeBlank: false},
+			{name: 'AFSC Pref 2', canBeBlank: true},
+			{name: 'AFSC Pref 3', canBeBlank: true},
+			{name: 'AFSC Pref 4', canBeBlank: true},
+			{name: 'AFSC Pref 5', canBeBlank: true},
+			{name: 'AFSC Pref 6', canBeBlank: true},
+			{name: 'AFSC Pref 7', canBeBlank: true},
+			{name: 'AFSC Pref 8', canBeBlank: true},
+			{name: 'AFSC Pref 9', canBeBlank: true},
+			{name: 'AFSC Pref 10', canBeBlank: true},
+			{name: 'AFSC Pref 11', canBeBlank: true},
+			{name: 'AFSC Pref 12', canBeBlank: true},
+			{name: 'AFSC Pref 13', canBeBlank: true},
+			{name: 'AFSC Pref 14', canBeBlank: true},
+			{name: 'AFSC Pref 15', canBeBlank: true},
+			{name: 'AFSC Pref 16', canBeBlank: true},
+			{name: 'AFSC Pref 17', canBeBlank: true},
+			{name: 'AFSC Pref 18', canBeBlank: true},
+			{name: 'AFSC Pref 19', canBeBlank: true},
+			{name: 'AFSC Pref 20', canBeBlank: true}
 		],
 
 		jobs: [
-
+			{name: 'AFSC', canBeBlank: false},
+			{name: 'EAD', canBeBlank: false},
+			{name: 'Seats Remaining', canBeBlank: false}
 		]
 	}
 
-	lineBreak = formatNewLineDelimiter(lineBreak);
 
-	function isHeaderLine() {
 
+function prepareDataString(string, delimiter, lineBreak, containsHeader) {
+
+	const EXPECTED_HEADERS = {
+		qw: [
+			{name: 'SSAN', canBeBlank: false},
+			{name: 'Days in DEP', canBeBlank: false},
+			{name: 'EAD From', canBeBlank: false},
+			{name: 'EAD To', canBeBlank: false},
+			{name: 'AFSC Pref 1', canBeBlank: false},
+			{name: 'AFSC Pref 2', canBeBlank: true},
+			{name: 'AFSC Pref 3', canBeBlank: true},
+			{name: 'AFSC Pref 4', canBeBlank: true},
+			{name: 'AFSC Pref 5', canBeBlank: true},
+			{name: 'AFSC Pref 6', canBeBlank: true},
+			{name: 'AFSC Pref 7', canBeBlank: true},
+			{name: 'AFSC Pref 8', canBeBlank: true},
+			{name: 'AFSC Pref 9', canBeBlank: true},
+			{name: 'AFSC Pref 10', canBeBlank: true},
+			{name: 'AFSC Pref 11', canBeBlank: true},
+			{name: 'AFSC Pref 12', canBeBlank: true},
+			{name: 'AFSC Pref 13', canBeBlank: true},
+			{name: 'AFSC Pref 14', canBeBlank: true},
+			{name: 'AFSC Pref 15', canBeBlank: true},
+			{name: 'AFSC Pref 16', canBeBlank: true},
+			{name: 'AFSC Pref 17', canBeBlank: true},
+			{name: 'AFSC Pref 18', canBeBlank: true},
+			{name: 'AFSC Pref 19', canBeBlank: true},
+			{name: 'AFSC Pref 20', canBeBlank: true}
+		],
+
+		jobs: [
+			{name: 'AFSC', canBeBlank: false},
+			{name: 'EAD', canBeBlank: false},
+			{name: 'Seats Remaining', canBeBlank: false}
+		]
 	}
+
+
+	lineBreak = formatNewLineDelimiter(lineBreak);
+	var lines = string.trim().split(lineBreak);
+
+	while (isHeaderLine(lines[0], EXPECTED_HEADERS.jobs.map((a)=>{return a.name})) === false) {
+		console.log('first line: ', lines[0]);
+		lines.splice(0, 1);
+	}
+	console.log('first line: ', lines[0]);
+
+
+	function isHeaderLine(line, expectedHeader) {
+		for (let i=0; i < expectedHeader.length; i++) {
+			if (line.indexOf(expectedHeader[i]) === -1) {
+				return false
+			}
+			return true
+		}
+	}
+
 
 }
 
+
+function formatNewLineDelimiter(delim) {
+	if (delim === '\r\n' || delim === '\n') {
+		if (getOs() === 'Windows') {
+			delim = '\r\n';
+		} else {delim = '\n';}
+	}
+	return delim;
+}
 
 
 function parseDataString(string, delimiter, lineBreak, containsHeader) {
@@ -336,11 +384,6 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	lineBreak = formatNewLineDelimiter(lineBreak);
 	var lines = string.trim().split(lineBreak);
 	var columnNames = [];
-
-	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-	console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
 
 	console.log(lines[0], lines[0].length);
 	// console.log('lines:', lines);
@@ -376,14 +419,7 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 
 
 
-	function formatNewLineDelimiter(delim) {
-		if (delim === '\r\n' || delim === '\n') {
-			if (getOs() === 'Windows') {
-				delim = '\r\n';
-			} else {delim = '\n';}
-		}
-		return delim;
-	}
+
 
 	function fixFragmentedStrings(arr) {
 		var fragmentedString = '';
