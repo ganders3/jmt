@@ -10,20 +10,10 @@ var dataStrings = {
 	jobs: undefined
 }
 
-// var qwString;
-// var jobsString;
 
 input.addEventListener('change', readFiles);
-//******************* figure out how to get IE to work when files are added ********************
-// input.attachEvent('onchange', handleFiles);
 
 
-
-// var wb = XLSX.read('data/test.xlsx');
-// console.log(wb);
-// var sheets = wb.SheetNames;
-// console.log(sheets);
-// console.log(XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]));
 
 
 $(document).ready(() => {
@@ -170,38 +160,14 @@ function listen() {
 		$('#icon-add-files').attr('style', 'opacity: 0.6');
 	});
 
-	// $('.icon-click').each(function() {
-	// 	$(this).on('mouseenter', function() {
-	// 		console.log('mouse on each');
-	// 	})
-	// });
-
 	$('#icon-close-qw').on('mouseenter', function() {
 		// console.log('enter qw');
 	});
 
-	// $('.icon-click').on('mouseenter', function() {
-	// 	console.log('mouse on icon click');
-	// 	// $(this).attr('style', 'opacity: 1');
-	// });
-
-	// $('.icon-click').on('mouseleave', function() {
-	// 	console.log('mouse off icon click');
-	// 	$(this).attr('style', 'opacity: 0.6');
-	// });
-
-
-	// $('[id ^= icon-close-]').click(function() {
-	// 	dataStrings[this.id.replace('icon-close-', '')] = undefined;
-	// });
-
 	$('#btn-start, .icon-click').on('mouseenter', function() {
-		// console.log('cheese');
+		console.log('cheese');
 	});
-
-
-
-	// updateDom();
+	//updateDom();
 }
 
 
@@ -240,18 +206,13 @@ function readFiles() {
 
 
 function checkForQwAndJobs(fileContents) {
-	// console.log('fileContents:', fileContents);
-	const EXPECTED_CONTENTS = {
-		qw: ['Applicant', 'SSAN', 'DEP Date', 'Days in DEP', 'EAD From', 'EAD To', 'AFSC Pref'],
-		jobs: ['AFSC', 'EAD', 'Seats Remaining']
-	}
+	var qwContents = EXPECTED_FIELDS.qw.map((a) => {return a.header});
+	var jobsContents = EXPECTED_FIELDS.jobs.map((a) => {return a.header});
 
-	if (checkFileContents(fileContents, EXPECTED_CONTENTS.qw)) {
-		// qwString = fileContents;
+	if (checkFileContents(fileContents, qwContents)) {
 		dataStrings.qw = fileContents;
-	} else if (checkFileContents(fileContents, EXPECTED_CONTENTS.jobs)) {
+	} else if (checkFileContents(fileContents, jobsContents)) {
 		dataStrings.jobs = fileContents;
-		// jobsString = fileContents;
 	}
 
 }
@@ -270,101 +231,60 @@ function parseExcel(fname) {
 	XLSX.readFile(fname);
 }
 
-	const EXPECTED_HEADERS = {
-		qw: [
-			{name: 'SSAN', canBeBlank: false},
-			{name: 'Days in DEP', canBeBlank: false},
-			{name: 'EAD From', canBeBlank: false},
-			{name: 'EAD To', canBeBlank: false},
-			{name: 'AFSC Pref 1', canBeBlank: false},
-			{name: 'AFSC Pref 2', canBeBlank: true},
-			{name: 'AFSC Pref 3', canBeBlank: true},
-			{name: 'AFSC Pref 4', canBeBlank: true},
-			{name: 'AFSC Pref 5', canBeBlank: true},
-			{name: 'AFSC Pref 6', canBeBlank: true},
-			{name: 'AFSC Pref 7', canBeBlank: true},
-			{name: 'AFSC Pref 8', canBeBlank: true},
-			{name: 'AFSC Pref 9', canBeBlank: true},
-			{name: 'AFSC Pref 10', canBeBlank: true},
-			{name: 'AFSC Pref 11', canBeBlank: true},
-			{name: 'AFSC Pref 12', canBeBlank: true},
-			{name: 'AFSC Pref 13', canBeBlank: true},
-			{name: 'AFSC Pref 14', canBeBlank: true},
-			{name: 'AFSC Pref 15', canBeBlank: true},
-			{name: 'AFSC Pref 16', canBeBlank: true},
-			{name: 'AFSC Pref 17', canBeBlank: true},
-			{name: 'AFSC Pref 18', canBeBlank: true},
-			{name: 'AFSC Pref 19', canBeBlank: true},
-			{name: 'AFSC Pref 20', canBeBlank: true}
-		],
 
-		jobs: [
-			{name: 'AFSC', canBeBlank: false},
-			{name: 'EAD', canBeBlank: false},
-			{name: 'Seats Remaining', canBeBlank: false}
-		]
-	}
-
-
-
-function prepareDataString(string, delimiter, lineBreak, containsHeader) {
-
-	const EXPECTED_HEADERS = {
-		qw: [
-			{name: 'SSAN', canBeBlank: false},
-			{name: 'Days in DEP', canBeBlank: false},
-			{name: 'EAD From', canBeBlank: false},
-			{name: 'EAD To', canBeBlank: false},
-			{name: 'AFSC Pref 1', canBeBlank: false},
-			{name: 'AFSC Pref 2', canBeBlank: true},
-			{name: 'AFSC Pref 3', canBeBlank: true},
-			{name: 'AFSC Pref 4', canBeBlank: true},
-			{name: 'AFSC Pref 5', canBeBlank: true},
-			{name: 'AFSC Pref 6', canBeBlank: true},
-			{name: 'AFSC Pref 7', canBeBlank: true},
-			{name: 'AFSC Pref 8', canBeBlank: true},
-			{name: 'AFSC Pref 9', canBeBlank: true},
-			{name: 'AFSC Pref 10', canBeBlank: true},
-			{name: 'AFSC Pref 11', canBeBlank: true},
-			{name: 'AFSC Pref 12', canBeBlank: true},
-			{name: 'AFSC Pref 13', canBeBlank: true},
-			{name: 'AFSC Pref 14', canBeBlank: true},
-			{name: 'AFSC Pref 15', canBeBlank: true},
-			{name: 'AFSC Pref 16', canBeBlank: true},
-			{name: 'AFSC Pref 17', canBeBlank: true},
-			{name: 'AFSC Pref 18', canBeBlank: true},
-			{name: 'AFSC Pref 19', canBeBlank: true},
-			{name: 'AFSC Pref 20', canBeBlank: true}
-		],
-
-		jobs: [
-			{name: 'AFSC', canBeBlank: false},
-			{name: 'EAD', canBeBlank: false},
-			{name: 'Seats Remaining', canBeBlank: false}
-		]
-	}
-
+function cleanUpDataString(string, delimiter, lineBreak, headerSpecs) {
 
 	lineBreak = formatNewLineDelimiter(lineBreak);
 	var lines = string.trim().split(lineBreak);
+	var expectedHeader = headerSpecs.map((a) => {return a.header});
+	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
 
-	while (isHeaderLine(lines[0], EXPECTED_HEADERS.jobs.map((a)=>{return a.name})) === false) {
-		console.log('first line: ', lines[0]);
+	// console.log('start:', lines.length);
+	//Check whether the first row is the header, and if not, remove the line
+	while (!isHeaderLine(lines[0], expectedHeader)) {
+		// console.log('removing header:', lines[0]);
 		lines.splice(0, 1);
 	}
-	console.log('first line: ', lines[0]);
+	//Set the header once it is found
+	var header = lines[0].split(delimiter);
+
+	for (let i=0; i < lines.length; i++) {
+		if (!isValidDataLine(lines[i], header, expectedHeader, canBeBlank)) {
+			// console.log('removing line:', lines[i]);
+			lines.splice(i, 1);
+		}
+	}
+	return lines;
+
+	// a = lines;
+
+
 
 
 	function isHeaderLine(line, expectedHeader) {
 		for (let i=0; i < expectedHeader.length; i++) {
 			if (line.indexOf(expectedHeader[i]) === -1) {
-				return false
+				return false;
 			}
-			return true
+			return true;
 		}
 	}
 
+	function isValidDataLine(line, header, expectedHeader, canBeBlank) {
+		// console.log('line:', line);
+		var fields = line.split(delimiter);
 
+		// console.log('header:', header);
+		for (let i=0; i < fields.length; i++) {
+			if (fields[i].trim() === '') {
+				var headerIndex = expectedHeader.indexOf(header[i]);
+				if (headerIndex !== -1 && canBeBlank[headerIndex] === false) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
 
 
@@ -378,15 +298,14 @@ function formatNewLineDelimiter(delim) {
 }
 
 
-function parseDataString(string, delimiter, lineBreak, containsHeader) {
-	//Trim the string to remove any blanks, and then split it into lines based on the line break character
-	// console.log('string:', string);
+function parseDataString(string, delimiter, lineBreak, containsHeader, headerSpecs) {
+// function parseDataString(string, delimiter, lineBreak, containsHeader) {
+	//Format the line break character depending on windows or linux
 	lineBreak = formatNewLineDelimiter(lineBreak);
-	var lines = string.trim().split(lineBreak);
-	var columnNames = [];
 
-	console.log(lines[0], lines[0].length);
-	// console.log('lines:', lines);
+	//Trim the string to remove any blanks, and then split it into lines based on the line break character
+	var lines = cleanUpDataString(string, delimiter, lineBreak, headerSpecs);
+	var columnNames = [];
 
 	//Set the object property names depending on whether the csv string has headers or not
 	if(containsHeader) {
@@ -396,7 +315,7 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 		lines.splice(0,1);
 	} else {
 		//If it doesn't have headers, assign column names 'X0' through 'Xn'
-		for(i=0; i<lines[0].split(delimiter).length; i++) {
+		for(let i=0; i<lines[0].split(delimiter).length; i++) {
 			columnNames.push('X' + i);
 		}
 	}
@@ -404,14 +323,12 @@ function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Iterate through each line in the data string
 	var arr = [];
 	lines.forEach((line) => {
-		console.log(line);
-
 		//Split each line by commas to get an array of each entry
 		var fields = line.split(delimiter);
 		fields = fixFragmentedStrings(fields)
 
 		arr.push({});
-		for(i=0; i<fields.length; i++) {
+		for(let i=0; i<fields.length; i++) {
 			arr[arr.length-1][columnNames[i]] = fields[i];
 		}
 	});
@@ -507,7 +424,7 @@ function getOs() {
 
 	let os = navigator.oscpu;
 
-	for (i=0; i<OS_LIST.length; i++) {
+	for (let i=0; i<OS_LIST.length; i++) {
 		if (os.search(OS_LIST[i].codeName) !== -1) {
 			return OS_LIST[i].name;
 		}
