@@ -18,10 +18,7 @@ input.addEventListener('change', readFiles);
 
 $(document).ready(() => {
 	updateDom();
-	listen();
 });
-
-
 
 
 
@@ -29,6 +26,7 @@ function updateDom() {
 
 	build();
 	style();
+	listen();
 
 
 	function build() {
@@ -48,7 +46,7 @@ function updateDom() {
 				$('#card-deck-files').append(
 					'<div class="card">' +
 						'<div class="card-block">' +
-							'<div><i class="ion-close-round icon-sm icon-click" id="icon-close-' + ds + '"></i></div>' +
+							'<div><i class="ion-close-round icon-sm icon-click icon-close" id="icon-close-' + ds + '"></i></div>' +
 							'<i id="icon-' + ds + '" class="' + ionClass + ' icon-main icon-sm icon-disabled"></i><h6 class="card-title">' + ds + '</h6>' +
 						'</div>' +
 					'</div>'
@@ -148,8 +146,6 @@ function updateDom() {
 
 
 
-
-
 function listen() {
 
 	$('form').on('mouseenter', function() {
@@ -160,48 +156,74 @@ function listen() {
 		$('#icon-add-files').attr('style', 'opacity: 0.6');
 	});
 
-	$('#icon-close-qw').on('mouseenter', function() {
-		// console.log('enter qw');
-	});
-
 	$('#btn-start, .icon-click').on('mouseenter', function() {
-		console.log('cheese');
+		// console.log('cheese');
 	});
-	//updateDom();
+
+	$('.icon-close').on('click', function() {
+		let objId = this.getAttribute('id').replace('icon-close-', '');
+		dataStrings[objId] = undefined;
+		updateDom();
+
+	});
+
 }
-
-
-
 
 
 function readFiles() {
 	var currentFiles = input.files;
 
 	for (i=0; i<currentFiles.length; i++) {
-		if (validFileType(currentFiles[i])) {
+
+		if(fileType(currentFiles[i]) === 'csv') {
+			console.log('CSV');
 			let fileReader = new FileReader();
+			fileReader.readAsText(currentFiles[i]);
 
 			fileReader.onload = (fr) => {
+				a = fr;
 				checkForQwAndJobs(fr.target.result);
 				updateDom();
 			}
-			fileReader.readAsText(currentFiles[i]);
+		} else if(fileType(currentFiles[i]) === 'excel') {
+			console.log('EXCEL');
+
+			var reader = new FileReader();
+			reader.readAsBinaryString(currentFiles[i]);
+
+			reader.onload = function(e) {
+				var data = e.target.result;
+				var workbook = XLSX.read(data, {type: 'binary'});
+
+				var firstSheetName = workbook.SheetNames[0];
+				var addressOfCell = 'A1';
+
+				var worksheet = workbook.Sheets[firstSheetName];
+
+				// a = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: true});
+				a = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false});
+			}
+
+
 		}
+
 	}
 
-	function validFileType(file) {
+
+	function fileType(file) {
 		const FILE_TYPES = [
-			'.csv',
-			'text/csv',
-			'application/vnd.ms-excel',
-	  		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			{jsType: '.csv', fileType: 'csv'},
+			{jsType: 'text/csv', fileType: 'csv'},
+			{jsType: 'application/vnd.ms-excel', fileType: 'csv'},
+			{jsType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileType: 'excel'}
 		];
 
-		for(var i = 0; i < FILE_TYPES.length; i++) {
-			if(file.type === FILE_TYPES[i]) {return true}
+		for(var i=0; i<FILE_TYPES.length; i++) {
+			if(file.type === FILE_TYPES[i].jsType) {return FILE_TYPES[i].fileType}
 		}
-		return false;
-	}	
+		return 'unknown';
+	}
+
 }
 
 
@@ -226,39 +248,32 @@ function checkFileContents(fileContents, expectedContents) {
 }
 
 
-
-function parseExcel(fname) {
-	XLSX.readFile(fname);
-}
-
-
-function cleanUpDataString(string, delimiter, lineBreak, headerSpecs) {
-
-	lineBreak = formatNewLineDelimiter(lineBreak);
-	var lines = string.trim().split(lineBreak);
+function cleanUpDataArray(array, headerSpecs) {
 	var expectedHeader = headerSpecs.map((a) => {return a.header});
 	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
 
-	// console.log('start:', lines.length);
-	//Check whether the first row is the header, and if not, remove the line
-	while (!isHeaderLine(lines[0], expectedHeader)) {
-		// console.log('removing header:', lines[0]);
-		lines.splice(0, 1);
+	while (!isHeaderLine(array[0], expectedHeader)) {
+		console.log('isHeaderLine removing line:', array[0]);
+		array.splice(0, 1);
 	}
-	//Set the header once it is found
-	var header = lines[0].split(delimiter);
 
-	for (let i=0; i < lines.length; i++) {
-		if (!isValidDataLine(lines[i], header, expectedHeader, canBeBlank)) {
-			// console.log('removing line:', lines[i]);
-			lines.splice(i, 1);
+	//Set the header once it is found
+	var header = array[0];
+	console.log('-------------------------------');
+	console.log('header line is:', header);
+	console.log('-------------------------------');
+
+	for (let i=0; i < array.length; i++) {
+		// console.log(array[i]);
+		if (!isValidDataLine(array[i], header, expectedHeader, canBeBlank)) {
+			console.log('isValidDataLine removing line ' + i +': ' + array[i]);
+			console.log('-------------------------------');
+			array.splice(i, 1);
 		}
 	}
-	return lines;
-
-	// a = lines;
-
-
+	console.log('done');
+	// console.log('array after clean:', array);
+	return array;
 
 
 	function isHeaderLine(line, expectedHeader) {
@@ -271,10 +286,57 @@ function cleanUpDataString(string, delimiter, lineBreak, headerSpecs) {
 	}
 
 	function isValidDataLine(line, header, expectedHeader, canBeBlank) {
-		// console.log('line:', line);
+		if (line.length === 0) {return false}
+		for (let j=0; j < line.length; j++) {
+			if (line[j].trim() === '') {
+				var headerIndex = expectedHeader.indexOf(header[j]);
+				if (headerIndex !== -1 && canBeBlank[headerIndex] === false) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+
+}
+
+
+
+function cleanUpDataString(string, delimiter, lineBreak, headerSpecs) {
+
+	lineBreak = formatNewLineDelimiter(lineBreak);
+	var lines = string.trim().split(lineBreak);
+	var expectedHeader = headerSpecs.map((a) => {return a.header});
+	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
+
+	//Check whether the first row is the header, and if not, remove the line
+	while (!isHeaderLine(lines[0], expectedHeader)) {
+		lines.splice(0, 1);
+	}
+	//Set the header once it is found
+	var header = lines[0].split(delimiter);
+
+	for (let i=0; i < lines.length; i++) {
+		if (!isValidDataLine(lines[i], header, expectedHeader, canBeBlank)) {
+			lines.splice(i, 1);
+		}
+	}
+	return lines;
+
+
+	function isHeaderLine(line, expectedHeader) {
+		for (let i=0; i < expectedHeader.length; i++) {
+			if (line.indexOf(expectedHeader[i]) === -1) {
+				return false;
+			}
+			return true;
+		}
+	}
+
+	function isValidDataLine(line, header, expectedHeader, canBeBlank) {
 		var fields = line.split(delimiter);
 
-		// console.log('header:', header);
 		for (let i=0; i < fields.length; i++) {
 			if (fields[i].trim() === '') {
 				var headerIndex = expectedHeader.indexOf(header[i]);
@@ -299,12 +361,12 @@ function formatNewLineDelimiter(delim) {
 
 
 function parseDataString(string, delimiter, lineBreak, containsHeader, headerSpecs) {
-// function parseDataString(string, delimiter, lineBreak, containsHeader) {
 	//Format the line break character depending on windows or linux
 	lineBreak = formatNewLineDelimiter(lineBreak);
 
 	//Trim the string to remove any blanks, and then split it into lines based on the line break character
 	var lines = cleanUpDataString(string, delimiter, lineBreak, headerSpecs);
+	console.log('lines:', lines);
 	var columnNames = [];
 
 	//Set the object property names depending on whether the csv string has headers or not
@@ -333,28 +395,24 @@ function parseDataString(string, delimiter, lineBreak, containsHeader, headerSpe
 		}
 	});
 	return arr;
+}
 
 
-
-
-
-	function fixFragmentedStrings(arr) {
-		var fragmentedString = '';
-		arr.forEach((field, ind) => {
-			if(field.search('\"') !== -1) {
-				if(fragmentedString === '') {
-					fragmentedString += field.replace('\"', '') + ', ';
-				} else {
-					fragmentedString += field.replace('\"', '');
-					arr[ind-1] = fragmentedString;
-					arr.splice(ind, 1);
-					fragmentedString = '';
-				}
+function fixFragmentedStrings(arr) {
+	var fragmentedString = '';
+	arr.forEach((field, ind) => {
+		if(field.search('\"') !== -1) {
+			if(fragmentedString === '') {
+				fragmentedString += field.replace('\"', '') + ', ';
+			} else {
+				fragmentedString += field.replace('\"', '');
+				arr[ind-1] = fragmentedString;
+				arr.splice(ind, 1);
+				fragmentedString = '';
 			}
-		});
-		return arr;
-	}
-
+		}
+	});
+	return arr;
 }
 
 
@@ -429,7 +487,7 @@ function getOs() {
 			return OS_LIST[i].name;
 		}
 	}
-	return 'Unknown';
+	return 'unknown';
 }
 
 

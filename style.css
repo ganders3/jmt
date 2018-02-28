@@ -156,6 +156,10 @@ ul {
 	cursor: pointer;
 }
 
+.icon-click:hover {
+	opacity: 1;
+}
+
 #icon-add-files {
 	color: #28a745;
 	/*opacity: 0.65;*/
