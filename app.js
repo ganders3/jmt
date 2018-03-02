@@ -10,10 +10,43 @@ var dataStrings = {
 	jobs: undefined
 }
 
+const EXPECTED_FIELDS = {
+	qw: [
+		{header: 'SSAN', canBeBlank: false},
+		{header: 'Days in DEP', canBeBlank: false},
+		{header: 'EAD From', canBeBlank: false},
+		{header: 'EAD To', canBeBlank: false},
+		{header: 'AFSC Pref 1', canBeBlank: false},
+		{header: 'AFSC Pref 2', canBeBlank: true},
+		{header: 'AFSC Pref 3', canBeBlank: true},
+		{header: 'AFSC Pref 4', canBeBlank: true},
+		{header: 'AFSC Pref 5', canBeBlank: true},
+		{header: 'AFSC Pref 6', canBeBlank: true},
+		{header: 'AFSC Pref 7', canBeBlank: true},
+		{header: 'AFSC Pref 8', canBeBlank: true},
+		{header: 'AFSC Pref 9', canBeBlank: true},
+		{header: 'AFSC Pref 10', canBeBlank: true},
+		{header: 'AFSC Pref 11', canBeBlank: true},
+		{header: 'AFSC Pref 12', canBeBlank: true},
+		{header: 'AFSC Pref 13', canBeBlank: true},
+		{header: 'AFSC Pref 14', canBeBlank: true},
+		{header: 'AFSC Pref 15', canBeBlank: true},
+		{header: 'AFSC Pref 16', canBeBlank: true},
+		{header: 'AFSC Pref 17', canBeBlank: true},
+		{header: 'AFSC Pref 18', canBeBlank: true},
+		{header: 'AFSC Pref 19', canBeBlank: true},
+		{header: 'AFSC Pref 20', canBeBlank: true}
+	],
 
-input.addEventListener('change', readFiles);
+	jobs: [
+		{header: 'AFSC', canBeBlank: false},
+		{header: 'EAD', canBeBlank: false},
+		{header: 'Seats Remaining', canBeBlank: false}
+	]
+}
 
 
+input.addEventListener('change', handleFiles);
 
 
 $(document).ready(() => {
@@ -114,7 +147,6 @@ function updateDom() {
 		styleButtons();
 		showSections();
 
-
 		function styleIcons() {
 			Object.keys(dataStrings).forEach((ds) => {
 				let fileLoaded = dataStrings[ds] !== undefined;
@@ -145,7 +177,6 @@ function updateDom() {
 } //End updateDom
 
 
-
 function listen() {
 
 	$('form').on('mouseenter', function() {
@@ -156,10 +187,6 @@ function listen() {
 		$('#icon-add-files').attr('style', 'opacity: 0.6');
 	});
 
-	$('#btn-start, .icon-click').on('mouseenter', function() {
-		// console.log('cheese');
-	});
-
 	$('.icon-close').on('click', function() {
 		let objId = this.getAttribute('id').replace('icon-close-', '');
 		dataStrings[objId] = undefined;
@@ -168,233 +195,227 @@ function listen() {
 	});
 
 }
+//==========================================================================================
+//=============================END OF DOM UPDATES===========================================
+//==========================================================================================
 
 
-function readFiles() {
+
+function handleFiles() {
 	var currentFiles = input.files;
 
-	for (i=0; i<currentFiles.length; i++) {
+	for (i=0; i < currentFiles.length; i++) {
+		var ftype = fileType(currentFiles[i]);
+		console.log('outside ftype:', ftype);
 
-		if(fileType(currentFiles[i]) === 'csv') {
-			console.log('CSV');
-			let fileReader = new FileReader();
-			fileReader.readAsText(currentFiles[i]);
+		var reader = new FileReader();
+		reader.readAsBinaryString(currentFiles[i]);
 
-			fileReader.onload = (fr) => {
-				a = fr;
-				checkForQwAndJobs(fr.target.result);
-				updateDom();
+		reader.onload = (e) => {
+			var data = undefined;
+			data = parseFile(e.target.result, ftype);
+
+			console.log('data:', data);
+			if (isQwFile(data)) {
+				// console.log('qw file');
+				dataStrings.qw = arrayToObjectArray(data, true);
 			}
-		} else if(fileType(currentFiles[i]) === 'excel') {
-			console.log('EXCEL');
-
-			var reader = new FileReader();
-			reader.readAsBinaryString(currentFiles[i]);
-
-			reader.onload = function(e) {
-				var data = e.target.result;
-				var workbook = XLSX.read(data, {type: 'binary'});
-
-				var firstSheetName = workbook.SheetNames[0];
-				var addressOfCell = 'A1';
-
-				var worksheet = workbook.Sheets[firstSheetName];
-
-				// a = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: true});
-				a = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false});
+			if (isJobsFile(data)) {
+				// console.log('jobs file');
+				dataStrings.jobs = arrayToObjectArray(data, true);
 			}
-
-
+			
+			updateDom();
 		}
+	} //End for i in currentFiles.length
 
-	}
 
-
-	function fileType(file) {
-		const FILE_TYPES = [
-			{jsType: '.csv', fileType: 'csv'},
-			{jsType: 'text/csv', fileType: 'csv'},
-			{jsType: 'application/vnd.ms-excel', fileType: 'csv'},
-			{jsType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileType: 'excel'}
-		];
-
-		for(var i=0; i<FILE_TYPES.length; i++) {
-			if(file.type === FILE_TYPES[i].jsType) {return FILE_TYPES[i].fileType}
-		}
-		return 'unknown';
-	}
 
 }
 
+function parseFile(file, ftype) {
+	console.log('ftype:', ftype);
+	if (ftype === 'csv') {
+		return parseCsv(file);
+	} else if (ftype === 'xlsx') {
+		return parseXlsx(file);
+	}
+}
 
-function checkForQwAndJobs(fileContents) {
+function parseCsv(string) {
+	var lineBreak = formatLineBreak('\r\n');
+	return parseString(string, ',', lineBreak);
+}
+
+function parseString(string, delimiter, lineBreak) {
+	var arr = [];
+	var lines = string.split(lineBreak);
+	// console.log('lines:', lines);
+
+	for (let i=0; i < lines.length; i++) {
+	// lines.forEach((line) => {
+		var fields = lines[i].split(delimiter);
+		fields = fixFragmentedStrings(fields);
+
+		arr.push([]);
+		for (let j=0; j < fields.length; j++) {
+			arr[i][j] = fields[j];
+		}
+	}
+	return arr;
+}
+
+function parseXlsx(file) {
+		var workbook = XLSX.read(file, {type: 'binary'});
+		var firstSheetName = workbook.SheetNames[0];
+		var worksheet = workbook.Sheets[firstSheetName];
+		
+		var arr = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false});
+		return arr;
+}
+
+function fileType(file) {
+	const FILE_TYPES = [
+		{jsType: '.csv', fileType: 'csv'},
+		{jsType: 'text/csv', fileType: 'csv'},
+		{jsType: 'application/vnd.ms-excel', fileType: 'csv'},
+		{jsType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileType: 'xlsx'}
+	];
+
+	for (var i=0; i<FILE_TYPES.length; i++) {
+		if (file.type === FILE_TYPES[i].jsType) {return FILE_TYPES[i].fileType}
+	}
+	return 'unknown';
+}
+
+
+function arrayToObjectArray(array, containsHeader) {
+	var header = [];
+	if (containsHeader) {
+		header = array[0];
+		array.splice(0,1);
+	} else {
+		for (let j=0; j < array[0].length; j++) {
+			header.push('x' + j);
+		}
+	}
+
+	var arrObj = [];
+	array.forEach((line) => {
+		arrObj.push({});
+		for (let j=0; j < line.length; j++) {
+			arrObj[arrObj.length-1][header[j]] = line[j];
+		}
+	});
+	return arrObj;
+}
+
+
+function isQwFile(data) {
 	var qwContents = EXPECTED_FIELDS.qw.map((a) => {return a.header});
+
+	return searchForContents(meltArray(data), qwContents);
+}
+
+function isJobsFile(data) {
 	var jobsContents = EXPECTED_FIELDS.jobs.map((a) => {return a.header});
 
-	if (checkFileContents(fileContents, qwContents)) {
-		dataStrings.qw = fileContents;
-	} else if (checkFileContents(fileContents, jobsContents)) {
-		dataStrings.jobs = fileContents;
-	}
-
+	return searchForContents(meltArray(data), jobsContents);
 }
 
 
-function checkFileContents(fileContents, expectedContents) {
-	for (i=0; i<expectedContents.length; i++) {
-		if (fileContents.search(expectedContents[i]) === -1) {return false}
+function meltArray(array) {
+	var melt = '';
+	for (let i=0; i < array.length; i++) {
+		for (let j=0; j < array[i].length; j++) {
+			melt += array[i][j];
+		}
+	}
+	return melt;
+}
+
+
+function searchForContents(data, expectedContents) {
+	for (i=0; i < expectedContents.length; i++) {
+		if (data.search(expectedContents[i]) === -1) {return false}
 	}
 	return true;
 }
 
 
-function cleanUpDataArray(array, headerSpecs) {
+function cleanDataArray(array, headerSpecs) {
 	var expectedHeader = headerSpecs.map((a) => {return a.header});
 	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
 
-	while (!isHeaderLine(array[0], expectedHeader)) {
-		console.log('isHeaderLine removing line:', array[0]);
+	while (array.length > 0 && !isHeaderLine(array[0], expectedHeader)) {
+		console.log('isHeaderLine removing line 0: ' + array[0]);
 		array.splice(0, 1);
 	}
+	a = array;
+	console.log(array);
 
-	//Set the header once it is found
 	var header = array[0];
-	console.log('-------------------------------');
 	console.log('header line is:', header);
-	console.log('-------------------------------');
 
-	for (let i=0; i < array.length; i++) {
-		// console.log(array[i]);
+	for (let i=array.length-1; i > -1; i--) {
 		if (!isValidDataLine(array[i], header, expectedHeader, canBeBlank)) {
-			console.log('isValidDataLine removing line ' + i +': ' + array[i]);
-			console.log('-------------------------------');
-			array.splice(i, 1);
+			console.log('isValidDataLine removing line ' + i + ': ' + array[i]);
+			array.splice(i,1);
 		}
 	}
-	console.log('done');
-	// console.log('array after clean:', array);
 	return array;
-
-
-	function isHeaderLine(line, expectedHeader) {
-		for (let i=0; i < expectedHeader.length; i++) {
-			if (line.indexOf(expectedHeader[i]) === -1) {
-				return false;
-			}
-			return true;
-		}
-	}
-
-	function isValidDataLine(line, header, expectedHeader, canBeBlank) {
-		if (line.length === 0) {return false}
-		for (let j=0; j < line.length; j++) {
-			if (line[j].trim() === '') {
-				var headerIndex = expectedHeader.indexOf(header[j]);
-				if (headerIndex !== -1 && canBeBlank[headerIndex] === false) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-
 }
 
 
 
-function cleanUpDataString(string, delimiter, lineBreak, headerSpecs) {
-
-	lineBreak = formatNewLineDelimiter(lineBreak);
-	var lines = string.trim().split(lineBreak);
-	var expectedHeader = headerSpecs.map((a) => {return a.header});
-	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
-
-	//Check whether the first row is the header, and if not, remove the line
-	while (!isHeaderLine(lines[0], expectedHeader)) {
-		lines.splice(0, 1);
-	}
-	//Set the header once it is found
-	var header = lines[0].split(delimiter);
-
-	for (let i=0; i < lines.length; i++) {
-		if (!isValidDataLine(lines[i], header, expectedHeader, canBeBlank)) {
-			lines.splice(i, 1);
+function isHeaderLine(line, expectedHeader) {
+	//If the line is empty or contains no values, it is not valid
+	if (line.length === 0) {return false}
+	
+	// Search through each expected header
+	for (let i=0; i < expectedHeader.length; i++) {
+		//If a header is not found, the line is not the header line
+		if (line.indexOf(expectedHeader[i]) === -1) {
+			return false;
 		}
-	}
-	return lines;
-
-
-	function isHeaderLine(line, expectedHeader) {
-		for (let i=0; i < expectedHeader.length; i++) {
-			if (line.indexOf(expectedHeader[i]) === -1) {
-				return false;
-			}
-			return true;
-		}
-	}
-
-	function isValidDataLine(line, header, expectedHeader, canBeBlank) {
-		var fields = line.split(delimiter);
-
-		for (let i=0; i < fields.length; i++) {
-			if (fields[i].trim() === '') {
-				var headerIndex = expectedHeader.indexOf(header[i]);
-				if (headerIndex !== -1 && canBeBlank[headerIndex] === false) {
-					return false;
-				}
-			}
-		}
+		//The line is the header line only if all expected headers are found
 		return true;
 	}
 }
 
 
-function formatNewLineDelimiter(delim) {
-	if (delim === '\r\n' || delim === '\n') {
+
+function isValidDataLine(line, header, expectedHeader, canBeBlank) {
+
+	h = header;
+	eh = expectedHeader;
+	cbb = canBeBlank;
+	//If the line doesn't contain at least as many fields as the header
+	if (line.length < header.length) {return false}
+	//Search through each field in the current line
+	for (let j=0; j < line.length; j++) {
+		//If the field is empty, investigate further
+		// console.log(j);
+		if (line[j] === undefined || line[j].trim() === '') {
+			// Find the index index in the expected headers array of the current field
+			var headerIndex = expectedHeader.indexOf(header[j]);
+			// If the header is in the list of expected headers, and it's blank when it shouldn't be, the line is invalid
+			if (headerIndex !== -1 && !canBeBlank[headerIndex]) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+function formatLineBreak(lineBreak) {
+	if (lineBreak === '\r\n' || lineBreak === '\n') {
 		if (getOs() === 'Windows') {
-			delim = '\r\n';
-		} else {delim = '\n';}
+			lineBreak = '\r\n';
+		} else {lineBreak = '\n';}
 	}
-	return delim;
-}
-
-
-function parseDataString(string, delimiter, lineBreak, containsHeader, headerSpecs) {
-	//Format the line break character depending on windows or linux
-	lineBreak = formatNewLineDelimiter(lineBreak);
-
-	//Trim the string to remove any blanks, and then split it into lines based on the line break character
-	var lines = cleanUpDataString(string, delimiter, lineBreak, headerSpecs);
-	console.log('lines:', lines);
-	var columnNames = [];
-
-	//Set the object property names depending on whether the csv string has headers or not
-	if(containsHeader) {
-		//If it has headers, the column names are the first line of the csv
-		columnNames = lines[0].split(delimiter);
-		//Then remove the first line so it isn't re-read
-		lines.splice(0,1);
-	} else {
-		//If it doesn't have headers, assign column names 'X0' through 'Xn'
-		for(let i=0; i<lines[0].split(delimiter).length; i++) {
-			columnNames.push('X' + i);
-		}
-	}
-
-	//Iterate through each line in the data string
-	var arr = [];
-	lines.forEach((line) => {
-		//Split each line by commas to get an array of each entry
-		var fields = line.split(delimiter);
-		fields = fixFragmentedStrings(fields)
-
-		arr.push({});
-		for(let i=0; i<fields.length; i++) {
-			arr[arr.length-1][columnNames[i]] = fields[i];
-		}
-	});
-	return arr;
+	return lineBreak;
 }
 
 
@@ -414,6 +435,7 @@ function fixFragmentedStrings(arr) {
 	});
 	return arr;
 }
+
 
 
 
@@ -452,6 +474,9 @@ function writeCsv(arr, fileName) {
 
 
 
+
+
+
 // Convert dates to JS format (dateParser is a D3 function)
 function dateStringToJs(dtInputString, dtFormat) {
 	let dateProcessor = d3.timeParse(dtFormat);
@@ -471,8 +496,6 @@ function dateJsToString(dtInputJs, dtFormat) {
 
 
 
-
-
 function getOs() {
 	let OS_LIST = [
 		{codeName: 'Windows', name: 'Windows'},
@@ -489,8 +512,6 @@ function getOs() {
 	}
 	return 'unknown';
 }
-
-
 
 
 function returnFileSize(number) {
