@@ -1,55 +1,6 @@
 //====================================================================================
 var matchingComplete = false;
 
-const NUM_ITER = 1;
-const NUM_AFSC_PREFS = 20;
-
-const DATE_FORMAT = {
-	QW: '%Y%m%d',
-	JOBS: '%d-%m-%Y'
-}
-
-// const EXPECTED_FIELDS = {
-// 	qw: [
-// 		{header: 'SSAN', canBeBlank: false},
-// 		{header: 'Days in DEP', canBeBlank: false},
-// 		{header: 'EAD From', canBeBlank: false},
-// 		{header: 'EAD To', canBeBlank: false},
-// 		{header: 'AFSC Pref 1', canBeBlank: false},
-// 		{header: 'AFSC Pref 2', canBeBlank: true},
-// 		{header: 'AFSC Pref 3', canBeBlank: true},
-// 		{header: 'AFSC Pref 4', canBeBlank: true},
-// 		{header: 'AFSC Pref 5', canBeBlank: true},
-// 		{header: 'AFSC Pref 6', canBeBlank: true},
-// 		{header: 'AFSC Pref 7', canBeBlank: true},
-// 		{header: 'AFSC Pref 8', canBeBlank: true},
-// 		{header: 'AFSC Pref 9', canBeBlank: true},
-// 		{header: 'AFSC Pref 10', canBeBlank: true},
-// 		{header: 'AFSC Pref 11', canBeBlank: true},
-// 		{header: 'AFSC Pref 12', canBeBlank: true},
-// 		{header: 'AFSC Pref 13', canBeBlank: true},
-// 		{header: 'AFSC Pref 14', canBeBlank: true},
-// 		{header: 'AFSC Pref 15', canBeBlank: true},
-// 		{header: 'AFSC Pref 16', canBeBlank: true},
-// 		{header: 'AFSC Pref 17', canBeBlank: true},
-// 		{header: 'AFSC Pref 18', canBeBlank: true},
-// 		{header: 'AFSC Pref 19', canBeBlank: true},
-// 		{header: 'AFSC Pref 20', canBeBlank: true}
-// 	],
-
-// 	jobs: [
-// 		{header: 'AFSC', canBeBlank: false},
-// 		{header: 'EAD', canBeBlank: false},
-// 		{header: 'Seats Remaining', canBeBlank: false}
-// 	]
-// }
-
-const KEEP_COLUMNS = {
-	QW: ['id', 'prefs', 'eadFrom', 'eadTo', 'daysInDep', 'selected', 'originalIndex', 'filledJob']
-}
-
-const SCORE_METHODS = ['equal', 'normalized', 'linear'];
-// var scores = {equal: {}, normalized: {}, linear: {}}
 var scores = {
 	equal: {
 		best: {
@@ -84,7 +35,6 @@ var scores = {
 		allRuns: []
 	}
 }
-
 //====================================================================================
 
 
@@ -114,6 +64,9 @@ function resetVariables() {
 	matches = [];
 	bestMatches = [];
 
+	jobsTable = [];
+	peopleTable = [];
+
 	for (key in scores) {
 		scores[key].best.iteration = -1;
 		scores[key].best.score = 0;
@@ -128,13 +81,8 @@ function resetVariables() {
 function importData() {
 	qwRaw = dataStrings.qw;
 	jobsRaw = dataStrings.jobs;
-	// qwRaw = parseDataString(dataStrings.qw, ',', '\r\n', true, EXPECTED_FIELDS.qw);
-	// qw = parseDataString(dataStrings.qw, ',', '\r\n', true);
-	// jobsRaw = parseDataString(dataStrings.jobs, ',', '\r\n', true, EXPECTED_FIELDS.jobs);
-	// jobs = parseDataString(dataStrings.jobs, ',', '\r\n', true);
-
-	console.log('qwRaw:', qwRaw);
-	console.log('jobsRaw:', jobsRaw);
+	// console.log('qwRaw:', qwRaw);
+	// console.log('jobsRaw:', jobsRaw);
 }
 
 
@@ -293,6 +241,7 @@ function matchJobs() {
 			return(a.jobInd - b.jobInd);
 		});
 
+
 		//Check each different score metric for a new best value
 		for (key in scores) {
 			//Checks for the best scores and saves that iteration's values
@@ -308,6 +257,7 @@ function matchJobs() {
 		}
 		findBestMatch();
 	} //End for i = 1 to N ITER
+	matchingComplete = true;
 
 
 	// vvvvvvvvvvvvvvvvvvvvvvvvvv matchJob functions below vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -380,7 +330,6 @@ function matchJobs() {
 		}
 	}
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	matchingComplete = true;
 } // End match jobs
 
 

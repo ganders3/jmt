@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-    <title>Job Match Tool</title>
+        <title>Job Match Tool</title>
 
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="vendor/ionicons/css/ionicons.css">
-    <link rel="stylesheet" href="style.css">
-  </head>
+        <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
+        <link rel="stylesheet" href="vendor/ionicons/css/ionicons.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
 
-  <body>
+    <body>
 
     <section id="sec-intro" class="section-1">
-      <div class="container col-sm-5">
+        <div class="container col-sm-5">
         <h1>AFRS Job Match Tool</h1>
 
         <p>
@@ -39,12 +39,12 @@
     <section id="sec-file-browse" class="section-2">
 
 
-      <div class="div-form">
+    <div class="div-form">
         <form id="form-file-upload" method="post" enctype="multipart/form-data">
-          <label for="file-uploads">
-            <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
-          </label>
-          <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
+            <label for="file-uploads">
+                <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
+            </label>
+            <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
         </form>
       </div>
 
@@ -67,6 +67,7 @@
 
 
     <section id="sec-results">
+
       <section class="section-1">
         <h2>Results</h2>
         <div class="card-deck text-center" id="card-deck-scores">
@@ -85,16 +86,31 @@
 
 
       <section class="section-1">
-        <div class="container col-sm-3">        
-          <div class="list-group text-center">
-            <ul id="match-list">
+            <table class="table">
+                <thead>
+                    <th scope="col">AFSC</th>
+                    <th scope="col">EAD</th>
+                    <th scope="col">Open seats</th>
+                    <th scope="col">Filled seats</th>
+                    <th scope="col">Filled by</th>
+                </thead>
+
+                <tbody id="match-list">
+                    <!-- The list here will be filled in using jQuery within the job-match.js file -->
+                </tbody>
+            </table>
+
+        <!-- <div class="container col-sm-3">         -->
+          <!-- <div class="list-group text-center"> -->
+            <!-- <ul id="match-list"> -->
               <!-- The list here will be filled in using jQuery within the job-match.js file -->
-            </ul>
-          </div>
-        </div>
+            <!-- </ul> -->
+          <!-- </div> -->
+        <!-- </div> -->
       </section>
+
     </section>
-    
+
 
     <footer class="footer">
       <div class="container">
@@ -131,9 +147,11 @@
     <script src="vendor/js/jquery-3.3.1.js"></script>
     <script src="vendor/js/xlsx.full.min.js"></script>
 
+    <script src="constants.js"></script>
     <script src="app.js"></script>
     <script src="job-match.js"></script>
-  </body>
+
+    </body>
 
 
 </html>

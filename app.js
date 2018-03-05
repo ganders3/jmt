@@ -1,6 +1,5 @@
 var initialize = true;
 var programRunning = false;
-// var initialize = true;
 
 var input = document.querySelector('input');
 var preview = document.querySelector('.file-preview');
@@ -10,49 +9,18 @@ var dataStrings = {
 	jobs: undefined
 }
 
-const EXPECTED_FIELDS = {
-	qw: [
-		{header: 'SSAN', canBeBlank: false},
-		{header: 'Days in DEP', canBeBlank: false},
-		{header: 'EAD From', canBeBlank: false},
-		{header: 'EAD To', canBeBlank: false},
-		{header: 'AFSC Pref 1', canBeBlank: false},
-		{header: 'AFSC Pref 2', canBeBlank: true},
-		{header: 'AFSC Pref 3', canBeBlank: true},
-		{header: 'AFSC Pref 4', canBeBlank: true},
-		{header: 'AFSC Pref 5', canBeBlank: true},
-		{header: 'AFSC Pref 6', canBeBlank: true},
-		{header: 'AFSC Pref 7', canBeBlank: true},
-		{header: 'AFSC Pref 8', canBeBlank: true},
-		{header: 'AFSC Pref 9', canBeBlank: true},
-		{header: 'AFSC Pref 10', canBeBlank: true},
-		{header: 'AFSC Pref 11', canBeBlank: true},
-		{header: 'AFSC Pref 12', canBeBlank: true},
-		{header: 'AFSC Pref 13', canBeBlank: true},
-		{header: 'AFSC Pref 14', canBeBlank: true},
-		{header: 'AFSC Pref 15', canBeBlank: true},
-		{header: 'AFSC Pref 16', canBeBlank: true},
-		{header: 'AFSC Pref 17', canBeBlank: true},
-		{header: 'AFSC Pref 18', canBeBlank: true},
-		{header: 'AFSC Pref 19', canBeBlank: true},
-		{header: 'AFSC Pref 20', canBeBlank: true}
-	],
-
-	jobs: [
-		{header: 'AFSC', canBeBlank: false},
-		{header: 'EAD', canBeBlank: false},
-		{header: 'Seats Remaining', canBeBlank: false}
-	]
-}
-
-
-input.addEventListener('change', handleFiles);
-
-
 $(document).ready(() => {
 	updateDom();
 });
 
+
+$.fn.slideToggleShow = function(show, speed) {
+	return show? $(this).slideDown(speed) : $(this).slideUp(speed);
+}
+
+$.fn.fadeToggleShow = function(show, speed) {
+	return show? $(this).fadeIn(speed) : $(this).fadeOut(speed);
+}
 
 
 function updateDom() {
@@ -60,7 +28,6 @@ function updateDom() {
 	build();
 	style();
 	listen();
-
 
 	function build() {
 
@@ -112,28 +79,35 @@ function updateDom() {
 
 
 		function buildMatches() {
-			if (typeof(matches) !== 'undefined') {
-				$.each(matches, (ind, match) => {
-					let msg;
-					let itemClass = 'list-group-item-';
-					let j = match.jobInd; let q = match.qwInd;
-					let dt = '';
-					if(jobs[j] !== undefined) {dt = dateJsToString(jobs[j].ead, '%d %b %y');}
 
-					if(j !== undefined && q !== undefined) {
-						msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> matched to <b>' + qw[q].id + '</b>.';
-						itemClass += 'success';
-					} else if(j !== undefined) {
-						msg = '<b>' + jobs[j].afsc + '</b> on <b>' + dt + '</b> was not filled.';
-						itemClass += 'danger';
-					} else if(q !== undefined) {
-						msg = '<b>' + qw[q].id + '</b> was not matched to a job.';
-						itemClass += 'warning';
+			if (typeof(jobs) !== 'undefined') {
+				$.each(jobs, (ind, job) => {
+					let tableContents = '';
+					let trClass = 'table-';
+					let dt = '';
+
+					let nFilled; let f;
+					if (job.filledBy !== undefined) {
+						nFilled = '1';
+						f = job.filledBy;
+						trClass += 'success';
+					} else {
+						nFilled = '0';
+						f = '';
+						trClass += 'danger';
 					}
 
-					$('#match-list').append('<li class="list-group-item">' + msg + '</li>');
-					$('#match-list li').last().addClass(itemClass);
+					tableContents += '<tr class="' + trClass + '">' + 
+									 	'<td>' + job.afsc + '</td>' +
+									 	'<td>' + dateJsToString(job.ead, '%d %b %y') + '</td>' + 
+									 	'<td>' + '1' + '</td>' +
+									 	'<td>' + nFilled + '</td>' +
+									 	'<td>' + f + '</td>' +
+									 '</tr>';
+
+					$('#match-list').append(tableContents);
 				});
+
 			}
 		}
 
@@ -167,8 +141,15 @@ function updateDom() {
 		}
 
 		function showSections() {
-			$('#sec-intro, #sec-file-browse').toggle(!programRunning);
-			$('#sec-results').toggle(programRunning);
+			let speed = 600;
+
+			if (initialize) {
+				speed = 0;
+				initialize = false;
+			}
+
+			$('#sec-results').slideToggleShow(programRunning, speed);
+			$('#sec-intro, #sec-file-browse').slideToggleShow(!programRunning, speed);	
 		}
 	}
 
@@ -178,6 +159,8 @@ function updateDom() {
 
 
 function listen() {
+
+	$('input').on('change', handleFiles);
 
 	$('form').on('mouseenter', function() {
 		$('#icon-add-files').attr('style', 'opacity: 1');
@@ -195,46 +178,48 @@ function listen() {
 	});
 
 }
+
 //==========================================================================================
 //=============================END OF DOM UPDATES===========================================
 //==========================================================================================
 
 
-
 function handleFiles() {
-	var currentFiles = input.files;
+	var fileSpecs = [];
+	var pending = 0;
 
-	for (i=0; i < currentFiles.length; i++) {
-		var ftype = fileType(currentFiles[i]);
-		console.log('outside ftype:', ftype);
+	Array.prototype.forEach.call(input.files, (file, ind) => {
+		pending++;
+		fileSpecs.push({
+			name: file.name,
+			size: fileSize(file.size),
+			type: fileType(file)
+		});
 
 		var reader = new FileReader();
-		reader.readAsBinaryString(currentFiles[i]);
+		reader.readAsBinaryString(file);
 
-		reader.onload = (e) => {
-			var data = undefined;
-			data = parseFile(e.target.result, ftype);
+		reader.onload = function(e) {
+			var data = parseFile(e.target.result, fileSpecs[ind].type);
 
-			console.log('data:', data);
-			if (isQwFile(data)) {
-				// console.log('qw file');
-				dataStrings.qw = arrayToObjectArray(data, true);
+			Object.keys(EXPECTED_FIELDS).forEach((ef) => {
+				if (searchForContents(meltArray(data), EXPECTED_FIELDS[ef].map(a => a.header))) {
+					data = cleanDataArray(data, EXPECTED_FIELDS[ef]);
+					dataStrings[ef] = arrayToObjectArray(data, true);
+				}
+			});
+
+			pending--;
+			if (pending === 0) {
+				updateDom();
 			}
-			if (isJobsFile(data)) {
-				// console.log('jobs file');
-				dataStrings.jobs = arrayToObjectArray(data, true);
-			}
-			
-			updateDom();
-		}
-	} //End for i in currentFiles.length
 
-
-
+		} // end reader.onload
+	}); // end forEach.call(inputFiles)
 }
 
+
 function parseFile(file, ftype) {
-	console.log('ftype:', ftype);
 	if (ftype === 'csv') {
 		return parseCsv(file);
 	} else if (ftype === 'xlsx') {
@@ -351,8 +336,6 @@ function cleanDataArray(array, headerSpecs) {
 		console.log('isHeaderLine removing line 0: ' + array[0]);
 		array.splice(0, 1);
 	}
-	a = array;
-	console.log(array);
 
 	var header = array[0];
 	console.log('header line is:', header);
@@ -514,7 +497,7 @@ function getOs() {
 }
 
 
-function returnFileSize(number) {
+function fileSize(number) {
 	if(number < 1024) {
 		return number + ' bytes';
 	} else if(number > 1024 && number < 1048576) {
