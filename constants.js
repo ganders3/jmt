@@ -2,12 +2,12 @@ const NUM_ITER = 1;
 const NUM_AFSC_PREFS = 20;
 
 const DATE_FORMAT = {
-	QW: '%Y%m%d',
-	JOBS: '%d-%m-%Y'
+	qw: '%Y%m%d',
+	jobs: '%d-%m-%Y'
 }
 
 const KEEP_COLUMNS = {
-	QW: ['id', 'prefs', 'eadFrom', 'eadTo', 'daysInDep', 'selected', 'originalIndex', 'filledJob']
+	qw: ['id', 'prefs', 'eadFrom', 'eadTo', 'daysInDep', 'selected', 'originalIndex', 'filledJob']
 }
 
 const SCORE_METHODS = ['equal', 'normalized', 'linear'];

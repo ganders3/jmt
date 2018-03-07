@@ -14,144 +14,113 @@
         <link rel="stylesheet" href="style.css">
     </head>
 
+
     <body>
 
-    <section id="sec-intro" class="section-1">
-        <div class="container col-sm-5">
-        <h1>AFRS Job Match Tool</h1>
+        <section id="sec-intro" class="section-1">
+            <div class="container col-sm-5">
+                <h1>AFRS Job Match Tool</h1>
 
-        <p>
-          Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:
-          <ul>
-            <li>&bull; <b>Q&amp;W file from AFRISS</b></li>
-            <li>&bull; <b>Open Jobs file from TTMS</b></li>
-          </ul>
-            The matching program will only assign recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
-        </p>
-      </div>
-    </section>
-
-
+                <p>
+                Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:
+                    <ul>
+                        <li>&bull; <b>Q&amp;W file from AFRISS</b></li>
+                        <li>&bull; <b>Open Jobs file from TTMS</b></li>
+                    </ul>
+                    The matching program will only assign recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
+                </p>
+            </div>
+        </section>
 
 
 
+        <section id="sec-file-browse" class="section-2">
 
-    <section id="sec-file-browse" class="section-2">
+            <div class="div-form">
+                <form id="form-file-upload" method="post" enctype="multipart/form-data">
+                    <label for="file-uploads">
+                        <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
+                    </label>
+                    <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
+                </form>
+            </div>
 
+            <div id="card-deck-files" class="card-deck mx-auto">
+                <!-- This section is filled in with jQuery -->
+            </div>
 
-    <div class="div-form">
-        <form id="form-file-upload" method="post" enctype="multipart/form-data">
-            <label for="file-uploads">
-                <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
-            </label>
-            <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
-        </form>
-      </div>
+            <div class="container text-center">
+                <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled>Run Job Match</button>
+            </div>
 
-         
-      <div id="card-deck-files" class="card-deck mx-auto">
-        <!-- This section is filled in with jQuery -->
-      </div>
-
-
-
-      <div class="container text-center">
-        <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled>Run Job Match</button>
-      </div>
-
-    </section>
+        </section>
 
 
 
+        <section id="sec-results">
+
+            <section class="section-1">
+                <h2>Results</h2>
+                <div class="card-deck text-center" id="card-deck-scores">
+                    <!-- The cards here will be filled in using jQuery within the job-match.js file -->
+                </div>
+            </section>
 
 
-
-    <section id="sec-results">
-
-      <section class="section-1">
-        <h2>Results</h2>
-        <div class="card-deck text-center" id="card-deck-scores">
-          <!-- The cards here will be filled in using jQuery within the job-match.js file -->
-        </div>
-      </section>
+            <section id="results-buttons" class="section-2">
+                <div class="container text-center">
+                    <a class="btn btn-primary" id="csv-link">Download Results</a>
+                    <button onclick="endProgram()" class="btn btn-secondary">Start Over</button>
+                </div>
+            </section>
 
 
-      <section id="results-buttons" class="section-2">
-        <div class="container text-center">
-          <a class="btn btn-primary" 
-          id="csv-link">Download Results</a>
-          <button onclick="endProgram()" class="btn btn-secondary">Start Over</button>
-        </div>
-      </section>
+            <section class="section-1">
+                <div class="table-responsive">          
+                    <table class="table" id="match-table">
+                    </table>
+                </div>
+            </section>
+
+        </section>
 
 
-      <section class="section-1">
-            <table class="table">
-                <thead>
-                    <th scope="col">AFSC</th>
-                    <th scope="col">EAD</th>
-                    <th scope="col">Open seats</th>
-                    <th scope="col">Filled seats</th>
-                    <th scope="col">Filled by</th>
-                </thead>
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
 
-                <tbody id="match-list">
-                    <!-- The list here will be filled in using jQuery within the job-match.js file -->
-                </tbody>
-            </table>
+                    <div class="col">
+                        <span>This website and the job matching algorithm are free and open source.</span>
+                    </div>
 
-        <!-- <div class="container col-sm-3">         -->
-          <!-- <div class="list-group text-center"> -->
-            <!-- <ul id="match-list"> -->
-              <!-- The list here will be filled in using jQuery within the job-match.js file -->
-            <!-- </ul> -->
-          <!-- </div> -->
-        <!-- </div> -->
-      </section>
+                    <div class="col">
+                        <ul class="ul-footer">
+                            <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span>Job Match Tool on Github</span></a></li>
+                            <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
+                        </ul>
+                    </div>
 
-    </section>
+                    <div class="col">
+                        <ul class="ul-footer">
+                            <li><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank"><img src="img/logo-afriss.png" alt="AFRISS-TF" class="footer-logo"></a></li>
+                            <br>
+                            <li><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank"><img src="img/logo-ttms.png" alt="TTMS" class="footer-logo"></a></li>
+                        </ul>
+                    </div>
 
-
-    <footer class="footer">
-      <div class="container">
-        <div class="row">
-
-          <div class="col">
-            <span>
-              This website and the job matching algorithm are free and open source.
-            </span>
-          </div>
-
-          <div class="col">
-            <ul class="ul-footer">
-              <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span>Job Match Tool on Github</span></a></li>
-              <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
-            </ul>
-          </div>
-
-          <div class="col">
-            <ul class="ul-footer">
-              <li><a href="https://afrisstf.csd.disa.mil/afrisstf/" target="_blank"><img src="img/logo-afriss.png" alt="AFRISS-TF" class="footer-logo"></a></li>
-              <br>
-              <li><a href="https://jm.ttms.us.af.mil/plateau/admin/login.jsp" target="_blank"><img src="img/logo-ttms.png" alt="TTMS" class="footer-logo"></a></li>
-            </ul>
-          </div>
-
-        </div>
-      </div>
-    </footer>
+                </div>
+            </div>
+        </footer>
 
 
-    <!-- xxxxxxxxxxxxxxxxxxxx Scripts xxxxxxxxxxxxxxxxxxxxxxxxxx -->
-    <script src="vendor/js/d3.min.js"></script>
-    <script src="vendor/js/jquery-3.3.1.js"></script>
-    <script src="vendor/js/xlsx.full.min.js"></script>
+        <!-- xxxxxxxxxxxxxxxxxxxx Scripts xxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <script src="vendor/js/d3.min.js"></script>
+        <script src="vendor/js/jquery-3.3.1.js"></script>
+        <script src="vendor/js/xlsx.full.min.js"></script>
 
-    <script src="constants.js"></script>
-    <script src="app.js"></script>
-    <script src="job-match.js"></script>
-
+        <script src="constants.js"></script>
+        <script src="app.js"></script>
+        <script src="job-match.js"></script>
     </body>
-
 
 </html>

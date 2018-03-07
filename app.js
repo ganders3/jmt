@@ -4,7 +4,7 @@ var programRunning = false;
 var input = document.querySelector('input');
 var preview = document.querySelector('.file-preview');
 
-var dataStrings = {
+var rawData = {
 	qw: undefined,
 	jobs: undefined
 }
@@ -38,7 +38,7 @@ function updateDom() {
 		function buildFileUpload() {
 			$('#card-deck-files').empty();
 
-			Object.keys(dataStrings).forEach((ds) => {
+			Object.keys(rawData).forEach((ds) => {
 				let ionClass;
 				if (ds === 'qw') {ionClass = 'ion-person-stalker';}
 				if (ds === 'jobs') {ionClass = 'ion-document-text';}
@@ -79,6 +79,21 @@ function updateDom() {
 
 
 		function buildMatches() {
+			var tbodyId = 'match-list';
+
+			$('#match-table').empty();
+			$('#match-table').append(
+				'<thead>' +
+					'<th scope="col">AFSC</th>' +
+                	'<th scope="col">EAD</th>' +
+                	'<th scope="col">Open seats</th>' +
+                	'<th scope="col">Filled seats</th>' +
+                	'<th scope="col">Filled by</th>' +
+                '</thead>' +
+                '<tbody id="' + tbodyId + '">'+
+                	//This section will be filled in using jQuery below
+                '</tbody>'
+				);
 
 			if (typeof(jobs) !== 'undefined') {
 				$.each(jobs, (ind, job) => {
@@ -105,7 +120,7 @@ function updateDom() {
 									 	'<td>' + f + '</td>' +
 									 '</tr>';
 
-					$('#match-list').append(tableContents);
+					$('#' + tbodyId).append(tableContents);
 				});
 
 			}
@@ -122,8 +137,8 @@ function updateDom() {
 		showSections();
 
 		function styleIcons() {
-			Object.keys(dataStrings).forEach((ds) => {
-				let fileLoaded = dataStrings[ds] !== undefined;
+			Object.keys(rawData).forEach((ds) => {
+				let fileLoaded = rawData[ds] !== undefined;
 				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
 				$('#icon-' + ds).toggleClass('icon-disabled', !fileLoaded);
 				$('#icon-close-' + ds).toggle(fileLoaded);
@@ -131,7 +146,7 @@ function updateDom() {
 		}
 		
 		function styleButtons() {
-			if (dataStrings.qw !== undefined && dataStrings.jobs !== undefined) {
+			if (rawData.qw !== undefined && rawData.jobs !== undefined) {
 				$('#btn-start').removeAttr('disabled');
 				$('#btn-start').removeClass('btn-disabled');
 			} else {
@@ -172,7 +187,7 @@ function listen() {
 
 	$('.icon-close').on('click', function() {
 		let objId = this.getAttribute('id').replace('icon-close-', '');
-		dataStrings[objId] = undefined;
+		rawData[objId] = undefined;
 		updateDom();
 
 	});
@@ -205,7 +220,7 @@ function handleFiles() {
 			Object.keys(EXPECTED_FIELDS).forEach((ef) => {
 				if (searchForContents(meltArray(data), EXPECTED_FIELDS[ef].map(a => a.header))) {
 					data = cleanDataArray(data, EXPECTED_FIELDS[ef]);
-					dataStrings[ef] = arrayToObjectArray(data, true);
+					rawData[ef] = arrayToObjectArray(data, true);
 				}
 			});
 
@@ -455,10 +470,59 @@ function writeCsv(arr, fileName) {
 }
 
 
+function summarize2dArray(array, summaryFields) {
+	let output = [];
+
+	for (i=0; i<array.length; i++) {
+
+	}
+}
 
 
+function arrayAllIndicesOf(array, matches) {
+	let output = [];
 
+	for (let i=0; i<array.length; i++) {
+		let n = 0;
+		for (let j=0; j<matches.length; j++) {
+			if (array[i][matches[j].field] === matches[j].value) {
+				n++;
+			}
+		}
+		if (n === matches.length) {
+			output.push(i);
+		}
+	}
+	return output;
+}
 
+function arrayIndexOf(array, matches) {
+	let indices = arrayAllIndicesOf(array, matches);
+	if (indices.length === 0) {
+		return -1;
+	} else {
+		return indices[0];
+	}
+}
+
+function allIndicesOf(array, match) {
+	let output = [];
+
+	for (let i=0; i<array.length; i++) {
+		if (array[i] === match) {
+			output.push(i);
+		}
+	}
+	return output;
+}
+
+//randomly sort an array
+function shuffleArray(arr) {
+	arr.sort(() => {
+		return 0.5 - Math.random();
+	});
+	return arr;
+}
 
 // Convert dates to JS format (dateParser is a D3 function)
 function dateStringToJs(dtInputString, dtFormat) {

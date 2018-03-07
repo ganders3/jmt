@@ -41,10 +41,9 @@ var scores = {
 function startProgram() {
 	programRunning = true;
 	resetVariables();
-	importData();
 
-	preprocessQw();
-	preprocessJobs();
+	qw = preprocessQw(rawData.qw);
+	jobs = preprocessJobs(rawData.jobs);
 	matchJobs();
 	logConsole();
 
@@ -54,6 +53,7 @@ function startProgram() {
 
 function endProgram() {
 	programRunning = false;
+	resetVariables();
 	updateDom();
 }
 
@@ -63,6 +63,7 @@ function resetVariables() {
 	jobs = [];
 	matches = [];
 	bestMatches = [];
+
 
 	jobsTable = [];
 	peopleTable = [];
@@ -77,52 +78,37 @@ function resetVariables() {
 	}
 }
 
+function preprocessQw(qwRaw) {
+	let arr = [];
+	for (let i=0; i<qwRaw.length; i++) {
+		arr.push({
+			prefs: [],
+			filledJob: [],
+			eadFrom: dateStringToJs(qwRaw[i]['EAD From'], DATE_FORMAT.qw),
+			eadTo: dateStringToJs(qwRaw[i]['EAD To'], DATE_FORMAT.qw),
+			daysInDep: +qwRaw[i]['Days in DEP'],
+			id: qwRaw[i]['SSAN'],
+			selected: false,
+			originalIndex: i
+		});
 
-function importData() {
-	qwRaw = dataStrings.qw;
-	jobsRaw = dataStrings.jobs;
-	// console.log('qwRaw:', qwRaw);
-	// console.log('jobsRaw:', jobsRaw);
-}
-
-
-
-function preprocessQw() {
-	qw = qwRaw;
-	qw.forEach((person, ind) => {
-		//Create a new empty array for the person's AFSC preferences
-		person.prefs = [];
-		person.filledJob = [];
-		//Loop through each preference
-		for (i=1; i <= NUM_AFSC_PREFS; i++) {
-			//Only proceed if there is a preference listed (not blank)
-			if (person['AFSC Pref ' + i] != '') {
-				//Add the afsc preference score to the (currently empty) prefs array
-				person.prefs.push({
-					afsc: person['AFSC Pref ' + i],
-					// score: 1//scorePreferences('linear')
+		for (let n=1; n<=NUM_AFSC_PREFS; n++) {
+			let afscPref = 'AFSC Pref ' + n;
+			if (qwRaw[i][afscPref] !== '') {
+				arr[i].prefs.push({
+					afsc: qwRaw[i][afscPref]
 				});
 			}
-		} //End for i=1 to NUM_AFSC_PREFS
-		//Convert the QW file date formats to JS format
-		person.eadFrom = dateStringToJs(person['EAD From'], DATE_FORMAT.QW);
-		person.eadTo = dateStringToJs(person['EAD To'], DATE_FORMAT.QW);
-		//Convert the value to numeric - it reads in as text
-		person.daysInDep = +person['Days in DEP'];
-		//Give each person a unique ID
-		person.id = person['SSAN'];
-		//Assign a variable to each person, indicating whether they have been matched to a job
-		person.selected = false;
-		person.originalIndex = ind;
+		}
 
 		//Remove fields that are no longer needed - only keep those indicated in the qwColsToKeep variable at the beginning of this script
-		for (key in person) {
-			if (KEEP_COLUMNS.QW.indexOf(key) == -1) {delete person[key]}
+		for (key in arr[i]) {
+			if (KEEP_COLUMNS.qw.indexOf(key) == -1) {delete arr[i][key]}
 		}
-	}); //End forEach person
+	}
 
 	//Score preferences
-	qw.forEach((person) => {
+	arr.forEach((person) => {
 		let n = person.prefs.length;
 		for (i=0; i<n; i++) {
 			person.prefs[i].score = {};
@@ -134,17 +120,22 @@ function preprocessQw() {
 			person.prefs[i].score.linear = (n-i)/n;
 		}
 	});
+	return arr;
+
 } //End preprocessQw
 
 
-function preprocessJobs() {
+function preprocessJobs(jobsRaw) {
+	let arr = [];
 	let iJobs = 0;
-	for (i=0; i<jobsRaw.length; i++) {
+
+	for (let i=0; i<jobsRaw.length; i++) {
 		//If there is more than one seat, duplicate that row for each seat
 		let seats = +jobsRaw[i]['Seats Remaining']
-		for (j=0; j<seats; j++) {
-			jobs.push({
-				ead: dateStringToJs(jobsRaw[i]['EAD'], DATE_FORMAT.JOBS),
+
+		for (let j=0; j<seats; j++) {
+			arr.push({
+				ead: dateStringToJs(jobsRaw[i]['EAD'], DATE_FORMAT.jobs),
 				afsc: jobsRaw[i]['AFSC'],
 				filledBy: undefined,
 				originalIndex: iJobs,
@@ -153,6 +144,7 @@ function preprocessJobs() {
 			iJobs++;
 		}
 	}
+	return arr;
 
 	function countPossibleFills(afsc, qw) {
 		let fills = 0;
@@ -165,14 +157,6 @@ function preprocessJobs() {
 	}
 } //end preprocessJobs
 
-
-//randomly sort an array
-function shuffleArray(arr) {
-	arr.sort(() => {
-		return 0.5 - Math.random();
-	});
-	return arr;
-}
 
 function matchJobs() {
 	for (iter=0; iter<NUM_ITER; iter++) {
