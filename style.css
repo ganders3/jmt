@@ -9,7 +9,7 @@ img {
 	max-width: 100%;
 }
 
-h1, h2 {
+h1, h2, h3 {
 	text-align: center;
 }
 
@@ -193,3 +193,4 @@ ul {
 .ion-close-round {
 	color: #d9534f;
 }
+

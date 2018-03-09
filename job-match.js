@@ -47,7 +47,7 @@ function startProgram() {
 	matchJobs();
 	logConsole();
 
-	writeCsv(matches);
+	writeCsv(jobsTable);
 	updateDom();
 }
 
@@ -65,7 +65,6 @@ function resetVariables() {
 	bestMatches = [];
 
 
-	jobsTable = [];
 	peopleTable = [];
 
 	for (key in scores) {
@@ -205,19 +204,15 @@ function matchJobs() {
 				//Save the index of the current match
 				matches[matches.length-1].qwInd = qw[iMatchingPerson].originalIndex;
 			}
-
-			///////////////Working here on making the jobs table
-			if (jobsTable.length > 0 && 
-				jobsTable.map(a => a.afsc).indexOf(job.afsc) !== -1 &&
-				jobsTable.map((a) => {if(!a.ead) {return 0} else {return a.ead.getTime()}}).indexOf() !== 
-
 		});
 
 		//Append the matches array with all unmatched people
-		//Filter the qw to only unmatched people
 		let qwUnmatched = qw.filter((person) => {
+			//Filter the qw to only unmatched people
 			return(person.filledJob.length == 0);
 		});
+
+		jobsTable = createJobsTable(jobs);
 
 		qwUnmatched.forEach((person) => {
 			matches.push({
@@ -319,6 +314,37 @@ function matchJobs() {
 			scores[metric].best.matches= scores[metric].allRuns[indexOfMax].matches;
 		}
 	}
+
+
+	function createJobsTable(jobs) {
+		let output = [];
+
+		for (let i=0; i < jobs.length; i++) {
+			let eadIndices = allIndicesOf(output.map(a => dateJsToString(a.ead)), dateJsToString(jobs[i].ead));
+			let afscIndices = allIndicesOf(output.map(a => a.afsc), jobs[i].afsc);
+			let intersectingIndices = arrayIntersection(eadIndices, afscIndices);
+			let filled = (jobs[i].filledBy === undefined) ? 0 : 1;
+
+			//If the ead and afsc combination already exists
+			if (intersectingIndices.length > 0) {
+				let t = intersectingIndices[0]
+				output[t].numSeats++;
+				output[t].numFilled += filled;
+				if (filled === 1) {output[t].filledBy += '; ' + jobs[i].filledBy}
+			} else {
+				output.push({
+					afsc: jobs[i].afsc,
+					ead: jobs[i].ead,
+					numSeats: 1,
+					numFilled: filled,
+					filledBy: filled === 1 ? jobs[i].filledBy : ''
+				});
+			}
+		}
+		return output;
+	}
+
+
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // End match jobs
 

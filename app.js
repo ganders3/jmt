@@ -81,13 +81,17 @@ function updateDom() {
 		function buildMatches() {
 			var tbodyId = 'match-list';
 
+			// Empty the table
 			$('#match-table').empty();
+
+			//Build table header
 			$('#match-table').append(
 				'<thead>' +
 					'<th scope="col">AFSC</th>' +
                 	'<th scope="col">EAD</th>' +
                 	'<th scope="col">Open seats</th>' +
                 	'<th scope="col">Filled seats</th>' +
+                	'<th scope="col">Unfilled seats</th>' +
                 	'<th scope="col">Filled by</th>' +
                 '</thead>' +
                 '<tbody id="' + tbodyId + '">'+
@@ -95,37 +99,23 @@ function updateDom() {
                 '</tbody>'
 				);
 
-			if (typeof(jobs) !== 'undefined') {
-				$.each(jobs, (ind, job) => {
-					let tableContents = '';
-					let trClass = 'table-';
-					let dt = '';
-
-					let nFilled; let f;
-					if (job.filledBy !== undefined) {
-						nFilled = '1';
-						f = job.filledBy;
-						trClass += 'success';
-					} else {
-						nFilled = '0';
-						f = '';
-						trClass += 'danger';
-					}
-
-					tableContents += '<tr class="' + trClass + '">' + 
-									 	'<td>' + job.afsc + '</td>' +
-									 	'<td>' + dateJsToString(job.ead, '%d %b %y') + '</td>' + 
-									 	'<td>' + '1' + '</td>' +
-									 	'<td>' + nFilled + '</td>' +
-									 	'<td>' + f + '</td>' +
-									 '</tr>';
-
-					$('#' + tbodyId).append(tableContents);
+			if (typeof(jobsTable) !== 'undefined') {
+				$.each(jobsTable, (ind, jt) => {
+					let trClass = jt.numFilled === jt.numSeats ? 'table-success' : 'table-danger'; 
+					// let filledBy = jt.filledBy.join('; ');
+					$('#' + tbodyId).append(
+						'<tr class="' + trClass + '">' +
+							'<td>' + jt.afsc + '</td>' +
+							'<td>' + dateJsToString(jt.ead, '%d %b %Y') + '</td>' +
+							'<td>' + jt.numSeats + '</td>' +
+							'<td>' + jt.numFilled + '</td>' +
+							'<td>' + (jt.numSeats - jt.numFilled) + '</td>' +
+							'<td>' + jt.filledBy + '</td>' +
+						'</tr>'
+						);
 				});
-
 			}
 		}
-
 
 	}
 
@@ -265,6 +255,8 @@ function parseString(string, delimiter, lineBreak) {
 	return arr;
 }
 
+// function date
+
 function parseXlsx(file) {
 		var workbook = XLSX.read(file, {type: 'binary'});
 		var firstSheetName = workbook.SheetNames[0];
@@ -393,7 +385,6 @@ function isValidDataLine(line, header, expectedHeader, canBeBlank) {
 	//Search through each field in the current line
 	for (let j=0; j < line.length; j++) {
 		//If the field is empty, investigate further
-		// console.log(j);
 		if (line[j] === undefined || line[j].trim() === '') {
 			// Find the index index in the expected headers array of the current field
 			var headerIndex = expectedHeader.indexOf(header[j]);
@@ -470,14 +461,6 @@ function writeCsv(arr, fileName) {
 }
 
 
-function summarize2dArray(array, summaryFields) {
-	let output = [];
-
-	for (i=0; i<array.length; i++) {
-
-	}
-}
-
 
 function arrayAllIndicesOf(array, matches) {
 	let output = [];
@@ -524,6 +507,14 @@ function shuffleArray(arr) {
 	return arr;
 }
 
+
+function arrayIntersection(arr1, arr2) {
+	let output = arr1.filter((i) => {
+		return arr2.indexOf(i) !== -1;
+	});
+	return output;
+}
+
 // Convert dates to JS format (dateParser is a D3 function)
 function dateStringToJs(dtInputString, dtFormat) {
 	let dateProcessor = d3.timeParse(dtFormat);
@@ -533,6 +524,7 @@ function dateStringToJs(dtInputString, dtFormat) {
 
 
 function dateJsToString(dtInputJs, dtFormat) {
+	if (dtFormat == undefined) {dtFormat = '%Y%m%d'}
 	if (dtInputJs != undefined) {
 		let dateProcessor = d3.timeFormat(dtFormat);
 		return dateProcessor(dtInputJs);
