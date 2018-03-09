@@ -205,6 +205,12 @@ function matchJobs() {
 				//Save the index of the current match
 				matches[matches.length-1].qwInd = qw[iMatchingPerson].originalIndex;
 			}
+
+			///////////////Working here on making the jobs table
+			if (jobsTable.length > 0 && 
+				jobsTable.map(a => a.afsc).indexOf(job.afsc) !== -1 &&
+				jobsTable.map((a) => {if(!a.ead) {return 0} else {return a.ead.getTime()}}).indexOf() !== 
+
 		});
 
 		//Append the matches array with all unmatched people
