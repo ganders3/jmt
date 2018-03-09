@@ -29,11 +29,14 @@ function updateDom() {
 	style();
 	listen();
 
+
 	function build() {
 
 		buildFileUpload();
 		buildScores();
-		buildMatches();
+		buildJobsTable();
+		buildQwTable();
+		// buildMatches();
 
 		function buildFileUpload() {
 			$('#card-deck-files').empty();
@@ -78,43 +81,88 @@ function updateDom() {
 
 
 
-		function buildMatches() {
-			var tbodyId = 'match-list';
+		function buildJobsTable() {
+			var containerId = '#container-jobs-table';
+			var tableTitle = 'Jobs Summary';
+
+			var jobsTableColumns = [
+				{field: 'afsc', display: 'AFSC'},
+				{field: 'ead', display: 'EAD'},
+				{field: 'numSeats', display: 'Open Seats'},
+				{field: 'numFilled', display: 'Filled Seats'},
+				{field: 'numUnfilled', display: 'Unfilled Seats'},
+				{field: 'filledBy', display: 'Filled By'}
+			];
 
 			// Empty the table
-			$('#match-table').empty();
-
-			//Build table header
-			$('#match-table').append(
-				'<thead>' +
-					'<th scope="col">AFSC</th>' +
-                	'<th scope="col">EAD</th>' +
-                	'<th scope="col">Open seats</th>' +
-                	'<th scope="col">Filled seats</th>' +
-                	'<th scope="col">Unfilled seats</th>' +
-                	'<th scope="col">Filled by</th>' +
-                '</thead>' +
-                '<tbody id="' + tbodyId + '">'+
-                	//This section will be filled in using jQuery below
-                '</tbody>'
+			$(containerId).empty();
+			// Build the table structure
+			$(containerId).append(
+				'<h3>' + tableTitle + '</h3>' +
+				'<table class="table table-hover table-bordered">' +
+					'<thead></thead>' +
+					'<tbody></tbody>' +
+				'</table>'
 				);
 
+			// Build the table header
+			$.each(jobsTableColumns, (ind, col) => {
+				$(containerId + ' > table > thead').append('<th scope="col">' + col.display + '</th>');
+			});
+
 			if (typeof(jobsTable) !== 'undefined') {
-				$.each(jobsTable, (ind, jt) => {
-					let trClass = jt.numFilled === jt.numSeats ? 'table-success' : 'table-danger'; 
-					// let filledBy = jt.filledBy.join('; ');
-					$('#' + tbodyId).append(
-						'<tr class="' + trClass + '">' +
-							'<td>' + jt.afsc + '</td>' +
-							'<td>' + dateJsToString(jt.ead, '%d %b %Y') + '</td>' +
-							'<td>' + jt.numSeats + '</td>' +
-							'<td>' + jt.numFilled + '</td>' +
-							'<td>' + (jt.numSeats - jt.numFilled) + '</td>' +
-							'<td>' + jt.filledBy + '</td>' +
-						'</tr>'
-						);
+				$.each(jobsTable, (ind, row) => {
+					let trClass = row.numUnfilled === 0 ? 'table-success' : 'table-danger';
+					let trData = '';
+
+					// Build the data for the current table row
+					$.each(jobsTableColumns, (ind, col) => {trData += '<td>' + row[col.field] + '</td>'});
+					// Append the row onto the table body
+					$(containerId  + ' > table > tbody').append('<tr class="' + trClass + '">' + trData + '</tr>');
 				});
 			}
+		}
+
+		function buildQwTable() {
+			var containerId = '#container-qw-table';
+			var tableTitle = 'Q &amp; W Summary';
+
+			var qwTableColumns = [
+				{field: 'id', display: 'ID'},
+				// {field: 'daysInDep', display: 'Days In DEP'},
+				{field: 'job', display: 'Matched AFSC'},
+				{field: 'ead', display: 'Matched EAD'}
+			];
+
+			// Empty the table
+			$(containerId).empty();
+			// Build the table structure
+			$(containerId).append(
+				'<h3>' + tableTitle + '</h3>' +
+				'<table class="table table-hover table-bordered">' +
+					'<thead></thead>' +
+					'<tbody></tbody>' +
+				'</table>'
+				);
+
+			// Build the table header
+			$.each(qwTableColumns, (ind, col) => {
+				$(containerId + ' > table > thead').append('<th scope="col">' + col.display + '</th>');
+			});
+
+			if (typeof(qwTable) !== 'undefined') {
+				$.each(qwTable, (ind, row) => {
+					let trClass = row.job !== 'Unmatched' ? 'table-success' : 'table-warning';
+					let trData = '';
+
+					// Build the data for the current table row
+					$.each(qwTableColumns, (ind, col) => {trData += '<td>' + row[col.field] + '</td>'});
+					// Append the row onto the table body
+					$(containerId  + ' > table > tbody').append('<tr class="' + trClass + '">' + trData + '</tr>');
+				});
+			}
+
+
 		}
 
 	}
@@ -428,11 +476,11 @@ function fixFragmentedStrings(arr) {
 
 
 
-function writeCsv(arr, fileName) {
+function writeCsv(array, fileName) {
 	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
 	//Append each row's data to the csv output data
 	var csvContent = CSV_METADATA;
-	arr.forEach((row) => {
+	array.forEach((row) => {
 		//Initialize current row content to a blank string
 		let rowContent = '';
 		//Loop through each key

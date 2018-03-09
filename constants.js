@@ -3,7 +3,8 @@ const NUM_AFSC_PREFS = 20;
 
 const DATE_FORMAT = {
 	qw: '%Y%m%d',
-	jobs: '%d-%m-%Y'
+	jobs: '%d-%m-%Y',
+	output: '%d %b %Y'
 }
 
 const KEEP_COLUMNS = {

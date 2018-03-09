@@ -39,33 +39,35 @@ var scores = {
 
 
 function startProgram() {
-	programRunning = true;
 	resetVariables();
+	programRunning = true;
 
 	qw = preprocessQw(rawData.qw);
 	jobs = preprocessJobs(rawData.jobs);
 	matchJobs();
 	logConsole();
 
-	writeCsv(jobsTable);
+	writeCsv(jobsTable, 'jobs.csv');
 	updateDom();
 }
 
 function endProgram() {
-	programRunning = false;
 	resetVariables();
+	programRunning = false;
 	updateDom();
 }
 
 
 function resetVariables() {
+	if (programRunning) {
+		rawData.qw = undefined;
+		rawData.jobs = undefined;
+	}
+	
 	qw = [];
 	jobs = [];
 	matches = [];
 	bestMatches = [];
-
-
-	peopleTable = [];
 
 	for (key in scores) {
 		scores[key].best.iteration = -1;
@@ -213,6 +215,7 @@ function matchJobs() {
 		});
 
 		jobsTable = createJobsTable(jobs);
+		qwTable = createQwTable(qw);
 
 		qwUnmatched.forEach((person) => {
 			matches.push({
@@ -320,7 +323,7 @@ function matchJobs() {
 		let output = [];
 
 		for (let i=0; i < jobs.length; i++) {
-			let eadIndices = allIndicesOf(output.map(a => dateJsToString(a.ead)), dateJsToString(jobs[i].ead));
+			let eadIndices = allIndicesOf(output.map(a => a.ead), dateJsToString(jobs[i].ead, DATE_FORMAT.output));
 			let afscIndices = allIndicesOf(output.map(a => a.afsc), jobs[i].afsc);
 			let intersectingIndices = arrayIntersection(eadIndices, afscIndices);
 			let filled = (jobs[i].filledBy === undefined) ? 0 : 1;
@@ -330,16 +333,33 @@ function matchJobs() {
 				let t = intersectingIndices[0]
 				output[t].numSeats++;
 				output[t].numFilled += filled;
+				output[t].numUnfilled = output[t].numSeats - output[t].numFilled;
 				if (filled === 1) {output[t].filledBy += '; ' + jobs[i].filledBy}
 			} else {
 				output.push({
 					afsc: jobs[i].afsc,
-					ead: jobs[i].ead,
+					ead: dateJsToString(jobs[i].ead, DATE_FORMAT.output),
 					numSeats: 1,
 					numFilled: filled,
+					numUnfilled: 1 - filled,
 					filledBy: filled === 1 ? jobs[i].filledBy : ''
 				});
 			}
+		}
+		return output;
+	}
+
+	function createQwTable(qw) {
+		let output = [];
+
+		for (let i=0; i < qw.length; i++) {
+			let job = qw[i].filledJob.length > 0 ? qw[i].filledJob[0].job : 'Unmatched';
+			let ead = qw[i].filledJob.length > 0 ? dateJsToString(qw[i].filledJob[0].ead, DATE_FORMAT.output) : '';
+			output.push({
+				id: qw[i].id,
+				job: job,
+				ead: ead
+			});
 		}
 		return output;
 	}
