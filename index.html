@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Job Match Tool</title>
+        <title>AFRS Job Match Tool</title>
 
         <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="vendor/ionicons/css/ionicons.css">
@@ -21,12 +21,12 @@
             <div class="container col-sm-5">
                 <h1>AFRS Job Match Tool</h1>
 
+                <p>Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:</p>
+                <ul>
+                    <li>&bull; <b>Q&amp;W file from AFRISS</b></li>
+                    <li>&bull; <b>Open Jobs file from TTMS</b></li>
+                </ul>
                 <p>
-                Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:
-                    <ul>
-                        <li>&bull; <b>Q&amp;W file from AFRISS</b></li>
-                        <li>&bull; <b>Open Jobs file from TTMS</b></li>
-                    </ul>
                     The matching program will only assign recruits to jobs which they are available to fill based on their EAD preferences, and which they have listed on their preferences. Because this website runs a lightweight algorithm, it works entirely on your local computer and does not upload or download any data. In other words, there is no concern over PII.
                 </p>
             </div>
@@ -40,14 +40,17 @@
                 <form id="form-file-upload" method="post" enctype="multipart/form-data">
                     <label for="file-uploads">
                         <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
+                        <p id="p-browse">Browse for files...</p>
                     </label>
                     <input type="file" id="file-uploads" name="file-uploads" accept=".csv, .xlsx, .xls" multiple>
                 </form>
+
+
+                <table id="table-files" class="table">
+                </table>
+
             </div>
 
-            <div id="card-deck-files" class="card-deck mx-auto">
-                <!-- This section is filled in with jQuery -->
-            </div>
 
             <div class="container text-center">
                 <button type="button" onclick="startProgram()" id="btn-start" class="btn btn-success" disabled>Run Job Match</button>

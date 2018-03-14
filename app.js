@@ -5,9 +5,20 @@ var input = document.querySelector('input');
 var preview = document.querySelector('.file-preview');
 
 var rawData = {
-	qw: undefined,
-	jobs: undefined
+	qw: {
+		name: undefined,
+		size: undefined,
+		type: undefined,
+		data: undefined
+	},
+	jobs: {
+		name: undefined,
+		size: undefined,
+		type: undefined,
+		data: undefined
+	}
 }
+
 
 $(document).ready(() => {
 	updateDom();
@@ -24,39 +35,49 @@ $.fn.fadeToggleShow = function(show, speed) {
 
 
 function updateDom() {
-
 	build();
 	style();
 	listen();
 
-
 	function build() {
-
 		buildFileUpload();
 		buildScores();
 		buildJobsTable();
 		buildQwTable();
-		// buildMatches();
 
+
+		//----------------------------build functions--------------------------------
 		function buildFileUpload() {
-			$('#card-deck-files').empty();
+			$('#table-files').empty().append('<tbody></tbody>');
+			Object.keys(rawData).forEach(rd => {
+				let ionClass; let nameText; let imgName;
+				if (rd === 'qw') {
+					ionClass = 'ion-person-stalker';
+					nameText = 'Q&amp;W File';
+				}
+				if (rd === 'jobs') {
+					ionClass = 'ion-document-text';
+					nameText = 'Jobs File';
+				}
+				if (rawData[rd].type === 'csv') {imgName = 'notepad'}
+				if (rawData[rd].type === 'xlsx') {imgName = 'excel'}
 
-			Object.keys(rawData).forEach((ds) => {
-				let ionClass;
-				if (ds === 'qw') {ionClass = 'ion-person-stalker';}
-				if (ds === 'jobs') {ionClass = 'ion-document-text';}
+				$('#table-files > tbody').append(
+					'<tr id="tr-' + rd + '">' +
+						'<td class="td-left">' +
+							'<i id="icon-' + rd + '" class="' + ionClass + ' icon-main icon-sm"></i> ' +
+							'<b>' + nameText + '</b>: ' +
+							'<img class="img-file-thumbnail" src="img/icon-' + imgName + '.png"> ' +
+							rawData[rd].name + ' (' + rawData[rd].size + ')' +
+						'</td>' +
+						'<td class="td-right">' +
+							'<i class="ion-close-round icon-sm icon-click icon-close" id="icon-close-' + rd + '"></i>' +
+						'</td>' +
+					'</tr>'
 
-				$('#card-deck-files').append(
-					'<div class="card">' +
-						'<div class="card-block">' +
-							'<div><i class="ion-close-round icon-sm icon-click icon-close" id="icon-close-' + ds + '"></i></div>' +
-							'<i id="icon-' + ds + '" class="' + ionClass + ' icon-main icon-sm icon-disabled"></i><h6 class="card-title">' + ds + '</h6>' +
-						'</div>' +
-					'</div>'
 					);
 			});
 		}
-
 
 
 		function buildScores() {
@@ -80,7 +101,6 @@ function updateDom() {
 		}
 
 
-
 		function buildJobsTable() {
 			var containerId = '#container-jobs-table';
 			var tableTitle = 'Jobs Summary';
@@ -95,9 +115,7 @@ function updateDom() {
 			];
 
 			// Empty the table
-			$(containerId).empty();
-			// Build the table structure
-			$(containerId).append(
+			$(containerId).empty().append(
 				'<h3>' + tableTitle + '</h3>' +
 				'<table class="table table-hover table-bordered">' +
 					'<thead></thead>' +
@@ -123,6 +141,7 @@ function updateDom() {
 			}
 		}
 
+
 		function buildQwTable() {
 			var containerId = '#container-qw-table';
 			var tableTitle = 'Q &amp; W Summary';
@@ -134,10 +153,8 @@ function updateDom() {
 				{field: 'ead', display: 'Matched EAD'}
 			];
 
-			// Empty the table
-			$(containerId).empty();
-			// Build the table structure
-			$(containerId).append(
+			// Empty the table and build
+			$(containerId).empty().append(
 				'<h3>' + tableTitle + '</h3>' +
 				'<table class="table table-hover table-bordered">' +
 					'<thead></thead>' +
@@ -161,30 +178,28 @@ function updateDom() {
 					$(containerId  + ' > table > tbody').append('<tr class="' + trClass + '">' + trData + '</tr>');
 				});
 			}
-
-
 		}
+		//-------------------------end of build functions---------------------
 
 	}
 
 
 	function style() {
-
 		styleIcons();
 		styleButtons();
 		showSections();
 
+		//-------------------------style functions---------------------------------
 		function styleIcons() {
-			Object.keys(rawData).forEach((ds) => {
-				let fileLoaded = rawData[ds] !== undefined;
-				//Set the icons for QW and Jobs as disabled not, depending on whether the data string exists
-				$('#icon-' + ds).toggleClass('icon-disabled', !fileLoaded);
-				$('#icon-close-' + ds).toggle(fileLoaded);
+			Object.keys(rawData).forEach(rd => {
+				let fileLoaded = rawData[rd].data !== undefined;
+				//Set the table rows for QW and Jobs as visible not, depending on whether the data string exists
+				$('#tr-' + rd).toggle(fileLoaded);
 			});
 		}
 		
 		function styleButtons() {
-			if (rawData.qw !== undefined && rawData.jobs !== undefined) {
+			if (rawData.qw.data !== undefined && rawData.jobs.data !== undefined) {
 				$('#btn-start').removeAttr('disabled');
 				$('#btn-start').removeClass('btn-disabled');
 			} else {
@@ -194,16 +209,15 @@ function updateDom() {
 		}
 
 		function showSections() {
-			let speed = 600;
-
+			let speed = 500;
 			if (initialize) {
 				speed = 0;
 				initialize = false;
 			}
-
 			$('#sec-results').slideToggleShow(programRunning, speed);
 			$('#sec-intro, #sec-file-browse').slideToggleShow(!programRunning, speed);	
 		}
+		//------------------------end of style functions---------------------------
 	}
 
 
@@ -217,15 +231,17 @@ function listen() {
 
 	$('form').on('mouseenter', function() {
 		$('#icon-add-files').attr('style', 'opacity: 1');
+		$('#p-browse').attr('style', 'opacity: 1');
 	});
 
 	$('form').on('mouseleave', function() {
 		$('#icon-add-files').attr('style', 'opacity: 0.6');
+		$('#p-browse').attr('style', 'opacity: 0.6');
 	});
 
 	$('.icon-close').on('click', function() {
 		let objId = this.getAttribute('id').replace('icon-close-', '');
-		rawData[objId] = undefined;
+		rawData[objId].data = undefined;
 		updateDom();
 
 	});
@@ -242,6 +258,7 @@ function handleFiles() {
 	var pending = 0;
 
 	Array.prototype.forEach.call(input.files, (file, ind) => {
+		// Since FileReader.onload is asynchronous, need to determine when it is done - the pending variable tracks this
 		pending++;
 		fileSpecs.push({
 			name: file.name,
@@ -258,14 +275,16 @@ function handleFiles() {
 			Object.keys(EXPECTED_FIELDS).forEach((ef) => {
 				if (searchForContents(meltArray(data), EXPECTED_FIELDS[ef].map(a => a.header))) {
 					data = cleanDataArray(data, EXPECTED_FIELDS[ef]);
-					rawData[ef] = arrayToObjectArray(data, true);
+					rawData[ef].name = fileSpecs[ind].name;
+					rawData[ef].size = fileSpecs[ind].size;
+					rawData[ef].type = fileSpecs[ind].type;
+					rawData[ef].data = arrayToObjectArray(data, true);
 				}
 			});
 
+			//Decrease pending for each file that is completely read
 			pending--;
-			if (pending === 0) {
-				updateDom();
-			}
+			if (pending === 0) {updateDom()}
 
 		} // end reader.onload
 	}); // end forEach.call(inputFiles)
@@ -388,16 +407,16 @@ function cleanDataArray(array, headerSpecs) {
 	var canBeBlank = headerSpecs.map((a) => {return a.canBeBlank});
 
 	while (array.length > 0 && !isHeaderLine(array[0], expectedHeader)) {
-		console.log('isHeaderLine removing line 0: ' + array[0]);
+		// console.log('isHeaderLine removing line 0: ' + array[0]);
 		array.splice(0, 1);
 	}
 
 	var header = array[0];
-	console.log('header line is:', header);
+	// console.log('header line is:', header);
 
 	for (let i=array.length-1; i > -1; i--) {
 		if (!isValidDataLine(array[i], header, expectedHeader, canBeBlank)) {
-			console.log('isValidDataLine removing line ' + i + ': ' + array[i]);
+			// console.log('isValidDataLine removing line ' + i + ': ' + array[i]);
 			array.splice(i,1);
 		}
 	}
@@ -476,7 +495,7 @@ function fixFragmentedStrings(arr) {
 
 
 
-function writeCsv(array, fileName) {
+function writeCsv(array, linkToElement, fileName) {
 	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
 	//Append each row's data to the csv output data
 	var csvContent = CSV_METADATA;
@@ -486,7 +505,7 @@ function writeCsv(array, fileName) {
 		//Loop through each key
 		for (key in row) {
 			//if the data headers have not yet been set (the only thing in the CSV is the metadata), set them now
-			if (csvContent == CSV_METADATA) {
+			if (csvContent === CSV_METADATA) {
 				rowContent += key + ',';
 			//If data headers have been set, start appending data
 			} else {
@@ -500,10 +519,17 @@ function writeCsv(array, fileName) {
 	});
 
 	let encodedUri = encodeURI(csvContent);
-	let link = document.getElementById('csv-link');
+
+	let link = document.getElementById(linkToElement);
+	if (link === null) {
+		link = document.createElement('a');
+		let text = document.createTextNode('Download csv');
+		link.appendChild(text);
+		document.body.appendChild(link);
+	}
 	link.setAttribute('href', encodedUri);
 
-	if (fileName===undefined){fileName = 'data.csv'}
+	if (fileName === undefined){fileName = 'file.csv'}
 	if (!fileName.endsWith('.csv')){fileName += '.csv'}
 	link.setAttribute('download', fileName);
 }
@@ -557,9 +583,7 @@ function shuffleArray(arr) {
 
 
 function arrayIntersection(arr1, arr2) {
-	let output = arr1.filter((i) => {
-		return arr2.indexOf(i) !== -1;
-	});
+	let output = arr1.filter(i => arr2.indexOf(i) !== -1);
 	return output;
 }
 
@@ -585,16 +609,15 @@ function dateJsToString(dtInputJs, dtFormat) {
 
 function getOs() {
 	let OS_LIST = [
-		{codeName: 'Windows', name: 'Windows'},
-		{codeName: 'Mac', name: 'Mac'},
-		{codeName: 'Linux', name: 'Linux'}
+		{platformName: 'Windows', os: 'Windows'},
+		{platformName: 'Windows', os: 'Windows'},
+		{platformName: 'Mac', os: 'Mac'},
+		{platformName: 'Linux', os: 'Linux'}
 	];
-
-	let os = navigator.oscpu;
-
+	let os = navigator.platform;
 	for (let i=0; i<OS_LIST.length; i++) {
-		if (os.search(OS_LIST[i].codeName) !== -1) {
-			return OS_LIST[i].name;
+		if (os.search(OS_LIST[i].platformName) !== -1) {
+			return OS_LIST[i].os;
 		}
 	}
 	return 'unknown';

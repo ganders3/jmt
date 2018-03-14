@@ -17,9 +17,6 @@ ul {
 	list-style: none;
 }
 
-.container {
-	/*align-content: center;*/
-}
 
 .section-1, .section-2 {
 	padding: 2rem 0rem;
@@ -45,17 +42,20 @@ ul {
 
 .card {
 	width: -moz-min-content;
-	/*padding: 1rem;*/
 }
 
 
-#form-file-upload {
+#form-file-upload, #table-files {
 	width: 50%;
 	min-width: 15rem;
+}
+
+#form-file-upload {
 	padding: 0;
 	display: inline-block;
 	background-color: #fff;
 	border: 2px dashed #55a7ff;
+	cursor: pointer;
 }
 
 #form-file-upload:hover {
@@ -70,15 +70,13 @@ ul {
 
 
 #form-file-upload input {
-	height: 5rem;
+	height: 0rem;
 	opacity: 0;
 }
 
 
-
 #sec-intro {
 	text-align: justify;
-	/*background: */
 }
 
 #sec-file-browse {
@@ -87,14 +85,8 @@ ul {
 }
 
 
-#btn-start {
-	/*cursor: not-allowed;*/
-}
-
-
 .icon-disabled, .btn-disabled {
 	opacity: 0.4;
-	/*cursor: not-allowed;*/
 }
 
 .btn-disabled {
@@ -137,9 +129,6 @@ ul {
 	margin-right: 1rem;
 }
 
-.ul-footer li {
-	/*margin: 1rem;*/
-}
 
 .ul-footer li a{
 	color: #fff;
@@ -152,7 +141,7 @@ ul {
 
 
 .icon-click {
-	opacity: 0.65;
+	opacity: 0.6;
 	cursor: pointer;
 }
 
@@ -196,4 +185,31 @@ ul {
 
 .table-container {
 	margin-bottom: 2rem;
+}
+
+#table-files {
+	margin: auto;
+	background-color: #fff;
+}
+
+
+.div-form {
+	margin-bottom: 2rem;
+}
+
+
+.td-left{
+	text-align: left;
+}
+
+.td-right {
+	text-align: right;
+}
+
+.img-file-thumbnail {
+	height: 2rem;
+}
+
+#p-browse {
+	opacity: 0.6;
 }

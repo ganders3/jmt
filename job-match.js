@@ -42,12 +42,12 @@ function startProgram() {
 	resetVariables();
 	programRunning = true;
 
-	qw = preprocessQw(rawData.qw);
-	jobs = preprocessJobs(rawData.jobs);
+	qw = preprocessQw(rawData.qw.data);
+	jobs = preprocessJobs(rawData.jobs.data);
 	matchJobs();
 	logConsole();
 
-	writeCsv(jobsTable, 'jobs.csv');
+	writeCsv(jobsTable, 'csv-link', 'jobs.csv');
 	updateDom();
 }
 
@@ -60,8 +60,8 @@ function endProgram() {
 
 function resetVariables() {
 	if (programRunning) {
-		rawData.qw = undefined;
-		rawData.jobs = undefined;
+		rawData.qw.data = undefined;
+		rawData.jobs.data = undefined;
 	}
 	
 	qw = [];
