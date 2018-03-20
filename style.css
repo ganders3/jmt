@@ -171,7 +171,9 @@ ul {
 
 
 .card-deck {
+	/*align-content: left;*/
 	justify-content: center;
+	/*center;*/
 }
 
 #card-deck-files .card {

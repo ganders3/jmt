@@ -79,6 +79,14 @@ function meltArray(array) {
 	return melt;
 }
 
+function reduceSum(accumulator, currentVal) {
+	return accumulator + currentVal;
+}
+
+function reduceMax(accumulator, currentVal) {
+	return Math.max(accumulator, currentVal);
+}
+
 
 function searchForContents(data, expectedContents) {
 	for (i=0; i < expectedContents.length; i++) {

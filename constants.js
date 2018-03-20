@@ -1,4 +1,3 @@
-// const NUM_ITER = 1;
 const NUM_AFSC_PREFS = 20;
 
 const DATE_FORMAT = {

@@ -81,40 +81,27 @@ function updateDom() {
 
 
 		function buildScores() {
-			// Empty the html elements containing the list of matches and the results
-			$('#card-deck-scores').empty().append(
-				'<div class="card">' + 
-					'<div class="card-block">' + 
-						'<h4 class="card-title">' + 'Jobs' + '</h4>' +
-						'<p class="card-text">' + 'Total: ' + 1 + '</p>' +
-						'<p class="card-text">' + 'Filled: ' + 1 + '</p>' +
-						'<p class="card-text">' + 'Unfilled: ' + 1 + '</p>' +
-					'</div>' +
-				'</div>' + 
-				'<div class="card">' + 
-					'<div class="card-block">' + 
-						'<h4 class="card-title">' + 'Q&amp;W' + '</h4>' +
-						'<p class="card-text">' + 'Total: ' + 1 + '</p>' +
-						'<p class="card-text">' + 'Matched: ' + 1 + '</p>' +
-						'<p class="card-text">' + 'Unmatched: ' + 1 + '</p>' +
-					'</div>' +
-				'</div>'
+			if (summary !== undefined) {
+				// Empty the html elements containing the list of matches and the results
+				$('#card-deck-scores').empty().append(
+					'<div class="card">' + 
+						'<div class="card-block">' + 
+							'<h4 class="card-title">' + 'Jobs' + '</h4>' +
+							'<p class="card-text">' + 'Total: ' + summary.jobs.total + '</p>' +
+							'<p class="card-text">' + 'Filled: ' + summary.jobs.filled + '</p>' +
+							'<p class="card-text">' + 'Unfilled: ' + summary.jobs.unfilled + '</p>' +
+						'</div>' +
+					'</div>' + 
+					'<div class="card">' + 
+						'<div class="card-block">' + 
+							'<h4 class="card-title">' + 'Q&amp;W' + '</h4>' +
+							'<p class="card-text">' + 'Total: ' + summary.qw.total + '</p>' +
+							'<p class="card-text">' + 'Matched: ' + summary.qw.matched + '</p>' +
+							'<p class="card-text">' + 'Unmatched: ' + summary.qw.unmatched + '</p>' +
+						'</div>' +
+					'</div>'
 				);
-
-			// if (typeof(scores) !== 'undefined') {
-				// $.each(scores, (ind, score) => {
-					// $('#card-deck-scores').append(
-					// 	'<div class="card">' + 
-					// 		'<div class="card-block">' + 
-					// 			'<h4 class="card-title">' + ind + '</h4>' +
-					// 			'<p class="card-text">Best score: ' + score.best.score + '</p>' +
-					// 			'<p class="card-text">Best iteration: ' + score.best.iteration + '</p>' +
-					// 			'<p class="card-text">Best number matches: ' + score.best.numMatches + '</p>' +
-					// 		'</div>' +
-					// 	'</div>'
-					// 	);
-				// });				
-			// }
+			}
 		}
 
 
@@ -219,6 +206,8 @@ function updateDom() {
 			if (rawData.qw.data !== undefined && rawData.jobs.data !== undefined) {
 				$('#btn-start').removeAttr('disabled');
 				$('#btn-start').removeClass('btn-disabled');
+				// $('#icon-add-files').removeClass('ion-plus-circled');
+				// $('#icon-add-files').addClass('ion-checkmark-round');
 			} else {
 				$('#btn-start').attr('disabled','disabled');
 				$('#btn-start').addClass('btn-disabled');
@@ -232,7 +221,9 @@ function updateDom() {
 				initialize = false;
 			}
 			$('#sec-results').slideToggleShow(programRunning, speed);
+			// $('#sec-results').fadeToggleShow(programRunning, speed);
 			$('#sec-intro, #sec-file-browse').slideToggleShow(!programRunning, speed);	
+			// $('#sec-intro, #sec-file-browse').fadeToggleShow(!programRunning, speed);	
 		}
 		//------------------------end of style functions---------------------------
 	}

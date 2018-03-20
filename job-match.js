@@ -36,7 +36,7 @@ var scores = {
 	}
 }
 
-var qw; var jobs; var matches;
+var qw; var jobs; var jobsTable; var qwTable; var matches; var summary;
 //====================================================================================
 
 
@@ -45,7 +45,6 @@ function startProgram() {
 	resetVariables();
 	preprocessFiles();
 	matchJobs();
-	logConsole();
 	updateDom();
 }
 
@@ -65,23 +64,13 @@ function resetVariables() {
 	qw = [];
 	jobs = [];
 	matches = [];
-	// bestMatches = [];
-
-	// for (key in scores) {
-	// 	scores[key].best.iteration = -1;
-	// 	scores[key].best.score = 0;
-	// 	scores[key].best.numMatches = 0;
-	// 	scores[key].best.matches = [];
-
-	// 	scores[key].allRuns = [];
-	// }
 }
 
 
 function preprocessFiles() {
-
 	qw = preprocessQw(rawData.qw.data);
 	jobs = preprocessJobs(rawData.jobs.data);
+
 
 
 	function preprocessQw(qwRaw) {
@@ -167,8 +156,6 @@ function preprocessFiles() {
 
 
 
-
-
 function matchJobs() {
 	// for (iter=0; iter<NUM_ITER; iter++) {
 	initializeMatchData();
@@ -179,7 +166,7 @@ function matchJobs() {
 			// iteration: iter,
 			score: 0,
 			numMatches: 0,
-			matches: []
+			// matches: []
 		});
 	}
 
@@ -188,10 +175,10 @@ function matchJobs() {
 		let matchingEad = job.ead;
 		let matchingAfsc = job.afsc;
 		//Append the list of matches
-		matches.push({
-			jobInd: job.originalIndex,
-			qwInd: undefined
-		});
+		// matches.push({
+		// 	jobInd: job.originalIndex,
+		// 	qwInd: undefined
+		// });
 		//Filter and sort QW data to find the best match
 		let qwFiltered = filterAndSortQw(qw, matchingEad, matchingAfsc);
 		//If there is at least 1 person to fill the job
@@ -214,7 +201,7 @@ function matchJobs() {
 			}
 
 			//Save the index of the current match
-			matches[matches.length-1].qwInd = qw[iMatchingPerson].originalIndex;
+			// matches[matches.length-1].qwInd = qw[iMatchingPerson].originalIndex;
 		}
 	});
 
@@ -224,41 +211,41 @@ function matchJobs() {
 		return(person.filledJob.length == 0);
 	});
 
-	jobsTable = createJobsTable(jobs);
 	qwTable = createQwTable(qw);
+	jobsTable = createJobsTable(jobs);
+	summary = createSummary(qw, jobs);
 
-	qwUnmatched.forEach((person) => {
-		matches.push({
-			jobInd: undefined,
-			qwInd: person.originalIndex
-		});
-	});
+	// qwUnmatched.forEach((person) => {
+	// 	matches.push({
+	// 		jobInd: undefined,
+	// 		qwInd: person.originalIndex
+	// 	});
+	// });
 
 	//sort matches array by jobInd
-	matches.sort((a,b) => {
-		return(a.jobInd - b.jobInd);
-	});
+	// matches.sort((a,b) => {
+	// 	return(a.jobInd - b.jobInd);
+	// });
 
 
 	//Check each different score metric for a new best value
-	for (key in scores) {
-		//Checks for the best scores and saves that iteration's values
-		if (scores[key].current > scores[key].best) {
-			scores[key].best = scores[key].current;
-			// scores[key].bestIteration = iter;
-			scores[key].bestNumMatches = scores.equal.current;
-			scores[key].bestMatches = saveIterationData(matches);
+	// for (key in scores) {
+	// 	//Checks for the best scores and saves that iteration's values
+	// 	if (scores[key].current > scores[key].best) {
+	// 		scores[key].best = scores[key].current;
+	// 		// scores[key].bestIteration = iter;
+	// 		scores[key].bestNumMatches = scores.equal.current;
+	// 		scores[key].bestMatches = saveIterationData(matches);
 
-			//***************************integrate the line below into the line above - need to fix the write csv function
-			bestMatches = saveIterationData(matches);
-		}
-	}
+	// 		//***************************integrate the line below into the line above - need to fix the write csv function
+	// 		bestMatches = saveIterationData(matches);
+	// 	}
+	// }
 	// findBestMatch();
 	// } //End for i = 1 to N ITER
 	// matchingComplete = true;
 
-	writeCsv(jobsTable, 'csv-link', 'jobs.csv');
-
+	// writeCsv(jobsTable, 'csv-link', 'jobs.csv');
 
 	// vvvvvvvvvvvvvvvvvvvvvvvvvv matchJob functions below vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	function initializeMatchData() {
@@ -281,7 +268,7 @@ function matchJobs() {
 			person.filledJob = [];
 		});
 
-		matches = [].slice();
+		// matches = [].slice();
 	}
 
 
@@ -309,27 +296,16 @@ function matchJobs() {
 
 
 
-	function saveIterationData(matches) {
-		let arr = [];
-		matches.forEach((match) => {
-			arr[arr.length] = {};
+	// function saveIterationData(matches) {
+	// 	let arr = [];
+	// 	matches.forEach((match) => {
+	// 		arr[arr.length] = {};
 
-			for (key in match) {arr[arr.length-1][key] = match[key]}
-			i++;
-		});
-		return arr;
-	}
-
-	// function findBestMatch() {
-	// 	for (metric in scores) {
-	// 		let indexOfMax = scores[metric].allRuns.map((a)=>{return a.score}).indexOf(Math.max(...scores[metric].allRuns.map((a)=>{return a.score})));
-	// 		scores[metric].best.iteration = scores[metric].allRuns[indexOfMax].iteration;
-	// 		scores[metric].best.score = scores[metric].allRuns[indexOfMax].score;
-	// 		scores[metric].best.numMatches = scores[metric].allRuns[indexOfMax].numMatches;
-	// 		scores[metric].best.matches= scores[metric].allRuns[indexOfMax].matches;
-	// 	}
+	// 		for (key in match) {arr[arr.length-1][key] = match[key]}
+	// 		i++;
+	// 	});
+	// 	return arr;
 	// }
-
 
 	function createJobsTable(jobs) {
 		let output = [];
@@ -376,15 +352,46 @@ function matchJobs() {
 		return output;
 	}
 
+	function createSummary(qw, jobs) {
+		var output = {
+			qw: {
+				total: 0,
+				matched: 0,
+				unmatched: 0
+			},
+			jobs: {
+				total: 0,
+				filled: 0,
+				unfilled: 0
+			}
+		}
 
+		output.qw.total = qw.length;
+		output.qw.matched = qw.filter(a => a.selected === true).length;
+		output.qw.unmatched = qw.filter(a => a.selected !== true).length;
+
+		output.jobs.total = jobs.length;
+		output.jobs.filled = jobs.filter(a => a.filledBy !== undefined).length;
+		output.jobs.unfilled = jobs.filter(a => a.filledBy === undefined).length;
+
+		return output;
+	}
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // End match jobs
 
 
 
-function logConsole() {
-	console.log('qw:', qw);
-	console.log('jobs:', jobs);
-	console.log('matches:', matches);
-	console.log('scores:', scores);
+
+function writeXlsxCrappy(jobsTable, qwTable, fileName) {
+	var wb = XLSX.utils.book_new();
+
+	var wsJobs = XLSX.utils.json_to_sheet(jobsTable);
+	var wsQw = XLSX.utils.json_to_sheet(qwTable);
+	XLSX.utils.book_append_sheet(wb, wsJobs, 'Jobs');
+	XLSX.utils.book_append_sheet(wb, wsQw, 'Q & W');
+
+	if (fileName === undefined) {fileName = 'data.xlsx'}
+	if (!fileName.endsWith('.xlsx')) {fileName += '.xlsx'}
+
+	XLSX.writeFile(wb, fileName);
 }
