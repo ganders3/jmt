@@ -215,3 +215,8 @@ ul {
 #p-browse {
 	opacity: 0.6;
 }
+
+.fill-bar {
+	height: 4rem;
+	width: 10rem;
+}

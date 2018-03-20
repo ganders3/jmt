@@ -46,8 +46,6 @@ function fileType(file) {
 
 
 
-
-
 function arrayToObjectArray(array, containsHeader) {
 	var header = [];
 	if (containsHeader) {
@@ -69,6 +67,7 @@ function arrayToObjectArray(array, containsHeader) {
 	return arrObj;
 }
 
+
 function meltArray(array) {
 	var melt = '';
 	for (let i=0; i < array.length; i++) {
@@ -79,13 +78,6 @@ function meltArray(array) {
 	return melt;
 }
 
-function reduceSum(accumulator, currentVal) {
-	return accumulator + currentVal;
-}
-
-function reduceMax(accumulator, currentVal) {
-	return Math.max(accumulator, currentVal);
-}
 
 
 function searchForContents(data, expectedContents) {
@@ -118,7 +110,6 @@ function cleanDataArray(array, headerSpecs) {
 }
 
 
-
 function isHeaderLine(line, expectedHeader) {
 	//If the line is empty or contains no values, it is not valid
 	if (line.length === 0) {return false}
@@ -137,10 +128,6 @@ function isHeaderLine(line, expectedHeader) {
 
 
 function isValidDataLine(line, header, expectedHeader, canBeBlank) {
-
-	h = header;
-	eh = expectedHeader;
-	cbb = canBeBlank;
 	//If the line doesn't contain at least as many fields as the header
 	if (line.length < header.length) {return false}
 	//Search through each field in the current line

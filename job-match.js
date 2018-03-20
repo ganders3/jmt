@@ -1,45 +1,3 @@
-//====================================================================================
-// var matchingComplete = false;
-
-var scores = {
-	equal: {
-		best: {
-			iteration: -1,
-			score: 0,
-			numMatches: 0,
-			matches: []
-		},
-
-		allRuns: []
-	},
-
-	normalized: {
-		best: {
-			iteration: -1,
-			score: 0,
-			numMatches: 0,
-			matches: []
-		},
-
-		allRuns: []
-	},
-
-	linear: {
-		best: {
-			iteration: -1,
-			score: 0,
-			numMatches: 0,
-			matches: []
-		},
-
-		allRuns: []
-	}
-}
-
-var qw; var jobs; var jobsTable; var qwTable; var matches; var summary;
-//====================================================================================
-
-
 function startProgram() {
 	programRunning = true;
 	resetVariables();
@@ -47,6 +5,7 @@ function startProgram() {
 	matchJobs();
 	updateDom();
 }
+
 
 function endProgram() {
 	programRunning = false;
@@ -72,7 +31,6 @@ function preprocessFiles() {
 	jobs = preprocessJobs(rawData.jobs.data);
 
 
-
 	function preprocessQw(qwRaw) {
 		let arr = [];
 		for (let i=0; i<qwRaw.length; i++) {
@@ -95,7 +53,6 @@ function preprocessFiles() {
 					});
 				}
 			}
-
 			//Remove fields that are no longer needed - only keep those indicated in the qwColsToKeep variable at the beginning of this script
 			for (key in arr[i]) {
 				if (KEEP_COLUMNS.qw.indexOf(key) == -1) {delete arr[i][key]}
@@ -157,28 +114,13 @@ function preprocessFiles() {
 
 
 function matchJobs() {
-	// for (iter=0; iter<NUM_ITER; iter++) {
 	initializeMatchData();
-
-	//Add a new element to the scores array for this current iteration
-	for (metric in scores) {
-		scores[metric].allRuns.push({
-			// iteration: iter,
-			score: 0,
-			numMatches: 0,
-			// matches: []
-		});
-	}
 
 	//Match each job
 	jobs.forEach((job) => {
 		let matchingEad = job.ead;
 		let matchingAfsc = job.afsc;
-		//Append the list of matches
-		// matches.push({
-		// 	jobInd: job.originalIndex,
-		// 	qwInd: undefined
-		// });
+
 		//Filter and sort QW data to find the best match
 		let qwFiltered = filterAndSortQw(qw, matchingEad, matchingAfsc);
 		//If there is at least 1 person to fill the job
@@ -193,88 +135,36 @@ function matchJobs() {
 				ead: matchingEad,
 				job: matchingAfsc
 			});
-
-			//Increment the current scores with the new match's scores
-			for (metric in scores) {
-				// scores[metric].allRuns[iter].score += qw[iMatchingPerson].prefs[iMatchingAfsc].score[metric];
-				// scores[metric].allRuns[iter].numMatches++;
-			}
-
-			//Save the index of the current match
-			// matches[matches.length-1].qwInd = qw[iMatchingPerson].originalIndex;
 		}
-	});
-
-	//Append the matches array with all unmatched people
-	let qwUnmatched = qw.filter((person) => {
-		//Filter the qw to only unmatched people
-		return(person.filledJob.length == 0);
 	});
 
 	qwTable = createQwTable(qw);
 	jobsTable = createJobsTable(jobs);
 	summary = createSummary(qw, jobs);
 
-	// qwUnmatched.forEach((person) => {
-	// 	matches.push({
-	// 		jobInd: undefined,
-	// 		qwInd: person.originalIndex
-	// 	});
-	// });
-
-	//sort matches array by jobInd
-	// matches.sort((a,b) => {
-	// 	return(a.jobInd - b.jobInd);
-	// });
-
-
-	//Check each different score metric for a new best value
-	// for (key in scores) {
-	// 	//Checks for the best scores and saves that iteration's values
-	// 	if (scores[key].current > scores[key].best) {
-	// 		scores[key].best = scores[key].current;
-	// 		// scores[key].bestIteration = iter;
-	// 		scores[key].bestNumMatches = scores.equal.current;
-	// 		scores[key].bestMatches = saveIterationData(matches);
-
-	// 		//***************************integrate the line below into the line above - need to fix the write csv function
-	// 		bestMatches = saveIterationData(matches);
-	// 	}
-	// }
-	// findBestMatch();
-	// } //End for i = 1 to N ITER
-	// matchingComplete = true;
-
 	// writeCsv(jobsTable, 'csv-link', 'jobs.csv');
+
+
+
 
 	// vvvvvvvvvvvvvvvvvvvvvvvvvv matchJob functions below vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	function initializeMatchData() {
-		//Reset each score's current value
-		for (key in scores) {scores[key].current = 0}
-
 		//Reset each job to be unfilled
-		jobs.forEach((job) => {
-			job.filledBy = undefined;
-		});
-
+		jobs.forEach(job => {job.filledBy = undefined});
 		//Sort jobs based on which are hardest to fill
-		jobs.sort((a,b) => {
-			return a.possibleFills - b.possibleFills;
-		});
+		jobs.sort((a,b) => {return a.possibleFills - b.possibleFills});
 
 		//Reset each person to be unselected
 		qw.forEach((person) => {
 			person.selected = false;
 			person.filledJob = [];
 		});
-
-		// matches = [].slice();
 	}
 
 
 	function filterAndSortQw(qw, matchingEad, matchingAfsc) {
 		//Filter the qw to people that meet the criteria:
-		let qwFiltered = qw.filter((person) => {
+		let qwFiltered = qw.filter(person => {
 			return (
 				person.eadFrom <= matchingEad && //The job EAD is on or after the person's first available date
 				(person.eadTo > matchingEad || person.eadTo == null) && //The job is before the person's last available date
@@ -295,17 +185,6 @@ function matchJobs() {
 	} //End function filterAndSortQw
 
 
-
-	// function saveIterationData(matches) {
-	// 	let arr = [];
-	// 	matches.forEach((match) => {
-	// 		arr[arr.length] = {};
-
-	// 		for (key in match) {arr[arr.length-1][key] = match[key]}
-	// 		i++;
-	// 	});
-	// 	return arr;
-	// }
 
 	function createJobsTable(jobs) {
 		let output = [];
@@ -378,7 +257,6 @@ function matchJobs() {
 	}
 	//^^^^^^^^^^^^^^^^^^^^^^^^^^^ matchJob functions above ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // End match jobs
-
 
 
 

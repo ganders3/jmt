@@ -1,3 +1,4 @@
+//========================================================================================================
 var initialize = true;
 var programRunning = false;
 
@@ -19,19 +20,25 @@ var rawData = {
 	}
 }
 
+var qw; var jobs; var jobsTable; var qwTable; var matches; var summary;
+//========================================================================================================
+
+
+//red #F5C6CB
+//green #C3E6CB
+//yellow #FFEEBA
+function draw() {
+	var canvas = document.getElementById('fill-bar-jobs');
+	var ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#FF0000';
+	ctx.fillRect(0, 0, canvas.width, 75);
+}
+
 
 $(document).ready(() => {
 	updateDom();
 });
-
-
-$.fn.slideToggleShow = function(show, speed) {
-	return show? $(this).slideDown(speed) : $(this).slideUp(speed);
-}
-
-$.fn.fadeToggleShow = function(show, speed) {
-	return show? $(this).fadeIn(speed) : $(this).fadeOut(speed);
-}
 
 
 function updateDom() {
@@ -90,6 +97,7 @@ function updateDom() {
 							'<p class="card-text">' + 'Total: ' + summary.jobs.total + '</p>' +
 							'<p class="card-text">' + 'Filled: ' + summary.jobs.filled + '</p>' +
 							'<p class="card-text">' + 'Unfilled: ' + summary.jobs.unfilled + '</p>' +
+							'<canvas id="fill-bar-jobs" class="fill-bar"></canvas>' +
 						'</div>' +
 					'</div>' + 
 					'<div class="card">' + 
@@ -98,10 +106,28 @@ function updateDom() {
 							'<p class="card-text">' + 'Total: ' + summary.qw.total + '</p>' +
 							'<p class="card-text">' + 'Matched: ' + summary.qw.matched + '</p>' +
 							'<p class="card-text">' + 'Unmatched: ' + summary.qw.unmatched + '</p>' +
+							'<canvas id="fill-bar-qw" class="fill-bar"></canvas>' +
 						'</div>' +
 					'</div>'
 				);
 			}
+
+			// let canvasJobs = $('#fill-bar-jobs');
+
+
+			// function drawBar([color1, color2, etc.])
+
+			// //red #F5C6CB
+			// //green #C3E6CB
+			// //yellow #FFEEBA
+			// function draw() {
+			// 	var canvas = document.getElementById('fill-bar-jobs');
+			// 	var ctx = canvas.getContext('2d');
+
+			// 	ctx.fillStyle = '#FF0000';
+			// 	ctx.fillRect(0, 0, canvas.width, 75);
+			// }
+
 		}
 
 
@@ -193,6 +219,7 @@ function updateDom() {
 		styleButtons();
 		showSections();
 
+
 		//-------------------------style functions---------------------------------
 		function styleIcons() {
 			Object.keys(rawData).forEach(rd => {
@@ -206,8 +233,6 @@ function updateDom() {
 			if (rawData.qw.data !== undefined && rawData.jobs.data !== undefined) {
 				$('#btn-start').removeAttr('disabled');
 				$('#btn-start').removeClass('btn-disabled');
-				// $('#icon-add-files').removeClass('ion-plus-circled');
-				// $('#icon-add-files').addClass('ion-checkmark-round');
 			} else {
 				$('#btn-start').attr('disabled','disabled');
 				$('#btn-start').addClass('btn-disabled');
@@ -221,9 +246,7 @@ function updateDom() {
 				initialize = false;
 			}
 			$('#sec-results').slideToggleShow(programRunning, speed);
-			// $('#sec-results').fadeToggleShow(programRunning, speed);
 			$('#sec-intro, #sec-file-browse').slideToggleShow(!programRunning, speed);	
-			// $('#sec-intro, #sec-file-browse').fadeToggleShow(!programRunning, speed);	
 		}
 		//------------------------end of style functions---------------------------
 	}
@@ -259,6 +282,13 @@ function listen() {
 //==========================================================================================
 //=============================END OF DOM UPDATES===========================================
 //==========================================================================================
+$.fn.slideToggleShow = function(show, speed) {
+	return show? $(this).slideDown(speed) : $(this).slideUp(speed);
+}
+
+$.fn.fadeToggleShow = function(show, speed) {
+	return show? $(this).fadeIn(speed) : $(this).fadeOut(speed);
+}
 
 
 function handleFiles() {
@@ -307,11 +337,13 @@ function parseFile(file, ftype) {
 	}
 }
 
+
 function isQwFile(data) {
 	var qwContents = EXPECTED_FIELDS.qw.map(a => a.header);
 
 	return searchForContents(meltArray(data), qwContents);
 }
+
 
 function isJobsFile(data) {
 	var jobsContents = EXPECTED_FIELDS.jobs.map(a => a.header);
