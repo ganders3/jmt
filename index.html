@@ -7,11 +7,13 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>AFRS Job Match Tool</title>
+        <title>AFRS Job Match</title>
 
         <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="vendor/ionicons/css/ionicons.css">
         <link rel="stylesheet" href="style.css">
+
+        <link rel="icon" href="img/usaf-hap.ico">
     </head>
 
 
@@ -19,7 +21,7 @@
 
         <section id="sec-intro" class="section-1">
             <div class="container col-sm-5">
-                <h1>AFRS Job Match Tool</h1>
+                <h1>AFRS Job Match</h1>
 
                 <p>Welcome. This tool is intended to save you time by matching jobs to recruits. It requires two files:</p>
                 <ul>
@@ -37,6 +39,7 @@
         <section id="sec-file-browse" class="section-2">
 
             <div class="div-form">
+                <p id="p-ready"><i class="ion-checkmark-round icon-md" id="icon-ready"></i> All required files loaded.</p>
                 <form id="form-file-upload" method="post" enctype="multipart/form-data">
                     <label for="file-uploads">
                         <i class="ion-plus-circled icon-md icon-click" id="icon-add-files"></i>
@@ -47,6 +50,7 @@
 
 
                 <table id="table-files" class="table">
+                    <!-- This table will be filled with jQuery -->
                 </table>
 
             </div>
@@ -64,8 +68,10 @@
 
             <section class="section-1">
                 <h2>Results</h2>
-                <div class="card-deck text-center" id="card-deck-scores">
-                    <!-- The cards here will be filled in using jQuery within the job-match.js file -->
+                <div class="container">
+                    <div class="card-deck text-center" id="card-deck-scores">
+                        <!-- The cards here will be filled in using jQuery within the job-match.js file -->
+                    </div>
                 </div>
             </section>
 
@@ -98,7 +104,7 @@
                     <div class="col">
                         <ul class="ul-footer">
                             <li><a href="https://github.com/ganders3/jmt" target="_blank"><i class="ion-social-github icon-sm icon-footer"></i><span>Job Match Tool on Github</span></a></li>
-                            <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>email@host.com</a></li>
+                            <li><a href="mailto:email@host.com"><i class="ion-email icon-sm icon-footer"></i>afrs.jm@gmail.com</a></li>
                         </ul>
                     </div>
 
@@ -121,7 +127,7 @@
         <script src="vendor/js/xlsx.full.min.js"></script>
 
         <script src="functions.js"></script>
-        <script src="constants.js"></script>
+        <!-- <script src="constants.js"></script> -->
         <script src="app.js"></script>
         <script src="job-match.js"></script>
     </body>

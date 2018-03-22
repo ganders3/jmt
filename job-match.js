@@ -19,7 +19,7 @@ function resetVariables() {
 		rawData.qw.data = undefined;
 		rawData.jobs.data = undefined;
 	}
-	
+
 	qw = [];
 	jobs = [];
 	matches = [];
@@ -193,7 +193,7 @@ function matchJobs() {
 			let eadIndices = allIndicesOf(output.map(a => a.ead), dateJsToString(jobs[i].ead, DATE_FORMAT.output));
 			let afscIndices = allIndicesOf(output.map(a => a.afsc), jobs[i].afsc);
 			let intersectingIndices = arrayIntersection(eadIndices, afscIndices);
-			let filled = (jobs[i].filledBy === undefined) ? 0 : 1;
+			let filled = !jobs[i].filledBy ? 0 : 1;
 
 			//If the ead and afsc combination already exists
 			if (intersectingIndices.length > 0) {
@@ -246,12 +246,12 @@ function matchJobs() {
 		}
 
 		output.qw.total = qw.length;
-		output.qw.matched = qw.filter(a => a.selected === true).length;
-		output.qw.unmatched = qw.filter(a => a.selected !== true).length;
+		output.qw.matched = qw.filter(a => a.selected).length;
+		output.qw.unmatched = qw.filter(a => !a.selected).length;
 
 		output.jobs.total = jobs.length;
-		output.jobs.filled = jobs.filter(a => a.filledBy !== undefined).length;
-		output.jobs.unfilled = jobs.filter(a => a.filledBy === undefined).length;
+		output.jobs.filled = jobs.filter(a => a.filledBy).length;
+		output.jobs.unfilled = jobs.filter(a => !a.filledBy).length;
 
 		return output;
 	}
@@ -268,7 +268,7 @@ function writeXlsxCrappy(jobsTable, qwTable, fileName) {
 	XLSX.utils.book_append_sheet(wb, wsJobs, 'Jobs');
 	XLSX.utils.book_append_sheet(wb, wsQw, 'Q & W');
 
-	if (fileName === undefined) {fileName = 'data.xlsx'}
+	if (!fileName) {fileName = 'data.xlsx'}
 	if (!fileName.endsWith('.xlsx')) {fileName += '.xlsx'}
 
 	XLSX.writeFile(wb, fileName);

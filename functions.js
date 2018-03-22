@@ -6,10 +6,8 @@ function parseCsv(string) {
 function parseString(string, delimiter, lineBreak) {
 	var arr = [];
 	var lines = string.split(lineBreak);
-	// console.log('lines:', lines);
 
 	for (let i=0; i < lines.length; i++) {
-	// lines.forEach((line) => {
 		var fields = lines[i].split(delimiter);
 		fields = fixFragmentedStrings(fields);
 
@@ -93,18 +91,13 @@ function cleanDataArray(array, headerSpecs) {
 	var canBeBlank = headerSpecs.map(a => a.canBeBlank);
 
 	while (array.length > 0 && !isHeaderLine(array[0], expectedHeader)) {
-		// console.log('isHeaderLine removing line 0: ' + array[0]);
 		array.splice(0, 1);
 	}
 
 	var header = array[0];
-	// console.log('header line is:', header);
 
 	for (let i=array.length-1; i > -1; i--) {
-		if (!isValidDataLine(array[i], header, expectedHeader, canBeBlank)) {
-			// console.log('isValidDataLine removing line ' + i + ': ' + array[i]);
-			array.splice(i,1);
-		}
+		if (!isValidDataLine(array[i], header, expectedHeader, canBeBlank)) {array.splice(i, 1)}
 	}
 	return array;
 }
@@ -133,7 +126,7 @@ function isValidDataLine(line, header, expectedHeader, canBeBlank) {
 	//Search through each field in the current line
 	for (let j=0; j < line.length; j++) {
 		//If the field is empty, investigate further
-		if (line[j] === undefined || line[j].trim() === '') {
+		if (!line[j] || line[j].trim() === '') {
 			// Find the index index in the expected headers array of the current field
 			var headerIndex = expectedHeader.indexOf(header[j]);
 			// If the header is in the list of expected headers, and it's blank when it shouldn't be, the line is invalid
@@ -174,8 +167,6 @@ function fixFragmentedStrings(arr) {
 }
 
 
-
-
 function writeCsv(array, linkToElement, fileName) {
 	const CSV_METADATA = 'data:text/csv;charset=utf-8,';
 	//Append each row's data to the csv output data
@@ -210,7 +201,7 @@ function writeCsv(array, linkToElement, fileName) {
 	}
 	link.setAttribute('href', encodedUri);
 
-	if (fileName === undefined){fileName = 'file.csv'}
+	if (!fileName) {fileName = 'file.csv'}
 	if (!fileName.endsWith('.csv')){fileName += '.csv'}
 	link.setAttribute('download', fileName);
 }
@@ -313,4 +304,41 @@ function fileSize(number) {
 	} else if(number > 1048576) {
 		return (number/1048576).toFixed(1) + ' MB';
 	}
+}
+
+
+function reduceSum(accumulator, currentValue) {
+	return accumulator + currentValue;
+}
+
+
+function drawStackedBar(canvasId, vals, colors) {
+	let canvas = document.getElementById(canvasId);
+	let ctx = canvas.getContext('2d');
+
+	if (vals.length !== colors.length) {return}
+
+	let valsTotal = vals.reduce(reduceSum);
+	let x = 0;
+	let currWidth = 0;
+	for (let i=0; i < vals.length; i++) {
+		let currWidth = canvas.width*(vals[i]/valsTotal);
+
+		ctx.fillStyle = colors[i];
+		ctx.fillRect(x, 0, currWidth, canvas.height);
+
+		ctx.fillStyle = '#000';
+		// ctx.font = '2rem Calibri';
+		let fontSize = canvas.width;
+		ctx.font = 'icon';
+		ctx.fillText(vals[i], x, 0.5*canvas.height);
+
+		x += currWidth;
+	}
+}
+
+
+function drawText(canvasId, textX, textY, fillColor){
+    canvasContext.fillStyle=fillColor;
+    canvasContext.fillText(showText, textX, textY);
 }

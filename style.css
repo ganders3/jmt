@@ -30,20 +30,47 @@ ul {
 	background-color: #eee;
 }
 
+#sec-intro {
+	text-align: justify;
+}
+
+#sec-file-browse {
+	text-align: center;
+	align-content: center;
+}
+
+/*------------------------buttons---------------------*/
 .btn, .btn-primary, .btn-secondary {
 	display: inline;
 	cursor: pointer;
-	/*margin-top: 1rem;*/
 }
 
+.btn-disabled {
+	cursor: not-allowed;
+	opacity: 0.4;
+}
+
+
+/*------------------------------cards---------------------*/
 .card-deck {
 	margin: 1rem 2rem;
+	justify-content: center;
+}
+
+#card-deck-files .card {
+	max-width: 10rem;
+	min-width: 10rem;
 }
 
 .card {
-	width: -moz-min-content;
+	/*width: -moz-min-content;*/
 }
 
+
+/*------------------------forms-----------------------*/
+.div-form {
+	margin-bottom: 2rem;
+}
 
 #form-file-upload, #table-files {
 	width: 50%;
@@ -68,47 +95,16 @@ ul {
 	cursor: pointer;
 }
 
-
 #form-file-upload input {
 	height: 0rem;
 	opacity: 0;
 }
 
-
-#sec-intro {
-	text-align: justify;
+#p-browse {
+	opacity: 0.6;
 }
 
-#sec-file-browse {
-	text-align: center;
-	align-content: center;
-}
-
-
-.icon-disabled, .btn-disabled {
-	opacity: 0.4;
-}
-
-.btn-disabled {
-	cursor: not-allowed;
-}
-
-.card-title {
-	text-transform: capitalize;
-}
-
-
-.footer {
-	width: 100%;
-	height: auto;
-	padding: 1rem 0 0.5rem 0;
-	bottom: 0;
-	position: fixed;
-	background-color: #333;
-	color: #fff;
-	font-size: 1rem;
-}
-
+/*------------------------------icons-----------------------*/
 .icon-main {
 	color: #007bff;
 }
@@ -129,6 +125,48 @@ ul {
 	margin-right: 1rem;
 }
 
+.icon-click {
+	opacity: 0.6;
+	cursor: pointer;
+}
+
+.icon-click:hover {
+	opacity: 1;
+}
+
+
+#icon-add-files, #icon-ready {
+	color: #28a745;
+	/*opacity: 0.65;*/
+}
+
+.ion-close-round {
+	color: #d9534f;
+}
+
+
+/*------------------------footer---------------------------*/
+.footer {
+	width: 100%;
+	height: auto;
+	padding: 1rem 0 0.5rem 0;
+	bottom: 0;
+	position: fixed;
+	background-color: #333;
+	color: #fff;
+	font-size: 1rem;
+}
+
+.footer-logo {
+	max-width: 9rem;
+	min-width: 9rem;
+	border-radius: 0.25rem;
+	opacity: 0.65;
+}
+
+.footer-logo:hover {
+	opacity: 1;
+}
 
 .ul-footer li a{
 	color: #fff;
@@ -140,65 +178,11 @@ ul {
 }
 
 
-.icon-click {
-	opacity: 0.6;
-	cursor: pointer;
-}
 
-.icon-click:hover {
-	opacity: 1;
-}
-
-#icon-add-files {
-	color: #28a745;
-	/*opacity: 0.65;*/
-}
-
-.footer-logo {
-	width: 9rem;
-	border-radius: 0.25rem;
-	opacity: 0.65;
-}
-
-.footer-logo:hover {
-	opacity: 1;
-}
-
-#card-deck-files {
-	max-width: auto;
-	/*margin-bottom: 1rem;*/
-}
-
-
-.card-deck {
-	/*align-content: left;*/
-	justify-content: center;
-	/*center;*/
-}
-
-#card-deck-files .card {
-	max-width: 10rem;
-	min-width: 10rem;
-}
-
-.ion-close-round {
-	color: #d9534f;
-}
-
+/*-------------------tables--------------------*/
 .table-container {
 	margin-bottom: 2rem;
 }
-
-#table-files {
-	margin: auto;
-	background-color: #fff;
-}
-
-
-.div-form {
-	margin-bottom: 2rem;
-}
-
 
 .td-left{
 	text-align: left;
@@ -208,15 +192,21 @@ ul {
 	text-align: right;
 }
 
+#table-files {
+	margin: auto;
+	background-color: #fff;
+}
+
+
+
+
 .img-file-thumbnail {
 	height: 2rem;
 }
 
-#p-browse {
-	opacity: 0.6;
-}
 
-.fill-bar {
+
+.canvas-fill-bar {
 	height: 4rem;
-	width: 10rem;
+	width: 80%;
 }
