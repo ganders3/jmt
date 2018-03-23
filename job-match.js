@@ -142,6 +142,10 @@ function matchJobs() {
 	jobsTable = createJobsTable(jobs);
 	summary = createSummary(qw, jobs);
 
+	console.log(qwTable);
+	console.log(jobsTable);
+	console.log(summary);
+
 	// writeCsv(jobsTable, 'csv-link', 'jobs.csv');
 
 
@@ -204,7 +208,8 @@ function matchJobs() {
 				if (filled === 1) {output[t].filledBy += '; ' + jobs[i].filledBy}
 			} else {
 				output.push({
-					afsc: jobs[i].afsc,
+					afsc: fixAfsc(jobs[i].afsc),
+					// ead: dateJsToExcel(jobs[i].ead),
 					ead: dateJsToString(jobs[i].ead, DATE_FORMAT.output),
 					numSeats: 1,
 					numFilled: filled,

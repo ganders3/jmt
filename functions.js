@@ -29,15 +29,15 @@ function parseXlsx(file) {
 }
 
 function fileType(file) {
+
 	const FILE_TYPES = [
 		{jsType: '.csv', fileType: 'csv'},
-		{jsType: 'text/csv', fileType: 'csv'},
-		{jsType: 'application/vnd.ms-excel', fileType: 'csv'},
-		{jsType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileType: 'xlsx'}
+		{jsType: '.xls', fileType: 'excel'},
+		{jsType: '.xlsx', fileType: 'excel'}
 	];
 
 	for (var i=0; i<FILE_TYPES.length; i++) {
-		if (file.type === FILE_TYPES[i].jsType) {return FILE_TYPES[i].fileType}
+		if (file.name.endsWith(FILE_TYPES[i].jsType)) {return FILE_TYPES[i].fileType}
 	}
 	return 'unknown';
 }
@@ -265,8 +265,6 @@ function dateStringToJs(dtInputString, dtFormat) {
 	return dateProcessor(dtInputString);
 }
 
-
-
 function dateJsToString(dtInputJs, dtFormat) {
 	if (dtFormat == undefined) {dtFormat = '%Y%m%d'}
 	if (dtInputJs != undefined) {
@@ -276,6 +274,14 @@ function dateJsToString(dtInputJs, dtFormat) {
 		return '';
 	}
 }
+
+function dateJsToExcel(dtInputJs) {
+	let excelRefDate = new Date('Dec 31, 1899');
+	let millisecondsPerDay = 1000*60*60*24;
+
+	return Math.ceil(dtInputJs/millisecondsPerDay) + -1*(Math.floor(excelRefDate/millisecondsPerDay)); 
+}
+
 
 
 
@@ -341,4 +347,12 @@ function drawStackedBar(canvasId, vals, colors) {
 function drawText(canvasId, textX, textY, fillColor){
     canvasContext.fillStyle=fillColor;
     canvasContext.fillText(showText, textX, textY);
+}
+
+function fixAfsc(afsc) {
+	let rep = /\.0+E{1}\+/;
+	let result = afsc.replace(rep, 'E');
+
+	while (result.length < 5) {result = result.replace('E', 'E0')}
+	return result;
 }

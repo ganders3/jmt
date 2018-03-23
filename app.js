@@ -106,15 +106,15 @@ function updateDom() {
 					ionClass = 'ion-document-text';
 					nameText = 'Jobs File';
 				}
-				if (rawData[rd].type === 'csv') {imgName = 'notepad'}
-				if (rawData[rd].type === 'xlsx') {imgName = 'excel'}
+				if (rawData[rd].type === 'csv') {imgName = 'csv'}
+				if (rawData[rd].type === 'excel') {imgName = 'excel'}
 
 				$('#table-files > tbody').append(
 					'<tr id="tr-' + rd + '">' +
 						'<td class="td-left">' +
 							'<i id="icon-' + rd + '" class="' + ionClass + ' icon-main icon-sm"></i> ' +
 							'<b>' + nameText + '</b>: ' +
-							'<img class="img-file-thumbnail" src="img/icon-' + imgName + '.png"> ' +
+							'<img class="img-file-thumbnail" src="img/icon-' + rawData[rd].type + '.png"> ' +
 							rawData[rd].name + ' (' + rawData[rd].size + ')' +
 						'</td>' +
 						'<td class="td-right">' +
@@ -182,7 +182,7 @@ function updateDom() {
 
 			if (typeof(jobsTable) !== 'undefined') {
 				$.each(jobsTable, (ind, row) => {
-					let trClass = row.numUnfilled === 0 ? 'table-success' : 'table-danger';
+					let trClass = row.numUnfilled === 0 ? 'table-success' : row.numUnfilled === row.numSeats ? 'table-danger' : 'table-warning';
 					let trData = '';
 
 					// Build the data for the current table row
@@ -196,7 +196,7 @@ function updateDom() {
 
 		function buildQwTable() {
 			var containerId = '#container-qw-table';
-			var tableTitle = 'Q &amp; W Summary';
+			var tableTitle = 'Q&amp;W Summary';
 
 			var qwTableColumns = [
 				{field: 'id', display: 'ID'},
@@ -251,9 +251,6 @@ function updateDom() {
 			});
 		}
 
-		function sac() {
-			console.log('hol');
-		}
 		
 		function styleButtons() {
 			if (rawData.qw.data && rawData.jobs.data) {
@@ -321,21 +318,24 @@ function handleFiles() {
 		reader.readAsBinaryString(file);
 
 		reader.onload = function(e) {
-			var data = parseFile(e.target.result, fileSpecs[ind].type);
+			//Only proceed if the current file has a known (valid) file type
+			if (fileSpecs[ind].type !== 'unknown') {
+				var data = parseFile(e.target.result, fileSpecs[ind].type);
 
-			Object.keys(EXPECTED_FIELDS).forEach((ef) => {
-				if (searchForContents(meltArray(data), EXPECTED_FIELDS[ef].map(a => a.header))) {
-					data = cleanDataArray(data, EXPECTED_FIELDS[ef]);
-					rawData[ef].name = fileSpecs[ind].name;
-					rawData[ef].size = fileSpecs[ind].size;
-					rawData[ef].type = fileSpecs[ind].type;
-					rawData[ef].data = arrayToObjectArray(data, true);
-				}
-			});
+				Object.keys(EXPECTED_FIELDS).forEach((ef) => {
+					if (searchForContents(meltArray(data), EXPECTED_FIELDS[ef].map(a => a.header))) {
+						data = cleanDataArray(data, EXPECTED_FIELDS[ef]);
+						rawData[ef].name = fileSpecs[ind].name;
+						rawData[ef].size = fileSpecs[ind].size;
+						rawData[ef].type = fileSpecs[ind].type;
+						rawData[ef].data = arrayToObjectArray(data, true);
+					}
+				});
 
-			//Decrease pending for each file that is completely read
-			pending--;
-			if (pending === 0) {updateDom()}
+				//Decrease pending for each file that is completely read
+				pending--;
+				if (pending === 0) {updateDom()}
+			}
 
 		} // end reader.onload
 	}); // end forEach.call(inputFiles)
@@ -345,7 +345,7 @@ function handleFiles() {
 function parseFile(file, ftype) {
 	if (ftype === 'csv') {
 		return parseCsv(file);
-	} else if (ftype === 'xlsx') {
+	} else if (ftype === 'excel') {
 		return parseXlsx(file);
 	}
 }

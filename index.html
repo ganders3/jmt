@@ -67,7 +67,7 @@
         <section id="sec-results">
 
             <section class="section-1">
-                <h2>Results</h2>
+                <h2>Match Results</h2>
                 <div class="container">
                     <div class="card-deck text-center" id="card-deck-scores">
                         <!-- The cards here will be filled in using jQuery within the job-match.js file -->
@@ -78,8 +78,7 @@
 
             <section id="results-buttons" class="section-2">
                 <div class="container text-center">
-                    <!-- <a class="btn btn-primary" id="csv-link">Download Results</a> -->
-                    <button onclick="writeXlsxCrappy(jobsTable, qwTable, 'match-results.xlsx')" class="btn btn-primary">Download results</button>
+                    <button onclick="writeXlsxCrappy(jobsTable, qwTable, 'match_results.xlsx')" class="btn btn-primary">Save results</button>
                     <button onclick="endProgram()" class="btn btn-secondary">Start Over</button>
                 </div>
             </section>
@@ -98,7 +97,7 @@
                 <div class="row">
 
                     <div class="col">
-                        <span>This website and the job matching algorithm are free and open source.</span>
+                        <span>This app and the job matching algorithm are free and open source.</span>
                     </div>
 
                     <div class="col">
@@ -123,11 +122,10 @@
 
         <!-- xxxxxxxxxxxxxxxxxxxx Scripts xxxxxxxxxxxxxxxxxxxxxxxxxx -->
         <script src="vendor/js/d3.min.js"></script>
-        <script src="vendor/js/jquery-3.3.1.js"></script>
+        <script src="vendor/js/jquery-3.3.1.min.js"></script>
         <script src="vendor/js/xlsx.full.min.js"></script>
 
         <script src="functions.js"></script>
-        <!-- <script src="constants.js"></script> -->
         <script src="app.js"></script>
         <script src="job-match.js"></script>
     </body>
