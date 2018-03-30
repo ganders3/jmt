@@ -322,6 +322,8 @@ function drawStackedBar(canvasId, vals, colors) {
 	let canvas = document.getElementById(canvasId);
 	let ctx = canvas.getContext('2d');
 
+	canvas.height = 75;
+	
 	if (vals.length !== colors.length) {return}
 
 	let valsTotal = vals.reduce(reduceSum);
@@ -334,15 +336,12 @@ function drawStackedBar(canvasId, vals, colors) {
 		ctx.fillRect(x, 0, currWidth, canvas.height);
 
 		ctx.fillStyle = '#000';
-		// ctx.font = '2rem Calibri';
-		let fontSize = canvas.width;
-		ctx.font = 'icon';
-		ctx.fillText(vals[i], x, 0.5*canvas.height);
+		ctx.font = '1rem Calibri';
+		ctx.fillText(vals[i], x + currWidth/2, 0.5*canvas.height);
 
 		x += currWidth;
 	}
 }
-
 
 function drawText(canvasId, textX, textY, fillColor){
     canvasContext.fillStyle=fillColor;
@@ -355,4 +354,30 @@ function fixAfsc(afsc) {
 
 	while (result.length < 5) {result = result.replace('E', 'E0')}
 	return result;
+}
+
+function createCanvas(w, h, ratio, id) {
+	if (!ratio) {ratio = getPixelRatio()}
+	let canvas = document.createElement('canvas');
+	canvas.width = w*ratio;
+	canvas.height = h*ratio;
+	canvas.style.width = w + 'px';
+	canvas.style.height	= h + 'px';
+	canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+
+	if (id) {canvas.id = id}
+
+	return canvas;
+}
+
+function getPixelRatio() {
+	let ctx = document.createElement('canvas').getContext('2d');
+	let devicePixelRatio = window.devicePixelRatio || 1;
+	let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                            ctx.mozBackingStorePixelRatio ||
+                            ctx.msBackingStorePixelRatio ||
+                            ctx.oBackingStorePixelRatio ||
+                            ctx.backingStorePixelRatio || 1;
+
+    return devicePixelRatio/backingStoreRatio;
 }

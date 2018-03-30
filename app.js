@@ -132,14 +132,22 @@ function updateDom() {
 					'<div class="card">' +
 						'<div class="card-block">' +
 							'<h4 class="card-title">' + 'Jobs' + '</h4>' +
-							'<p>Total jobs: ' + summary.jobs.total + '</p>' +
+							'<p>' +
+								'Total: <b>' + summary.jobs.total + '</b>; ' + 
+								'Filled: <b>' + summary.jobs.filled + '</b>; ' +
+								'Unfilled: <b>' + summary.jobs.unfilled + '</b>' +
+							'</p>' +
 							'<canvas id="fill-bar-jobs" class="canvas-fill-bar"></canvas>' +
 						'</div>' +
 					'</div>' +
 					'<div class="card">' +
 						'<div class="card-block">' +
 							'<h4 class="card-title">' + 'Q&amp;W' + '</h4>' +
-							'<p>Total Q&amp;W: ' + summary.qw.total + '</p>' +
+							'<p>' +
+								'Total: <b>' + summary.qw.total + '</b>; ' + 
+								'Matched: <b>' + summary.qw.matched + '</b>; ' +
+								'Unmatched: <b>' + summary.qw.unmatched + '</b>' +
+							'</p>' +
 							'<canvas id="fill-bar-qw" class="canvas-fill-bar"></canvas>' +
 						'</div>' +
 					'</div>'
